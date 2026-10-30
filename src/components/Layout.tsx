@@ -16,7 +16,9 @@ import {
   Sun,
   Moon,
   Globe,
-  User as UserIcon
+  User as UserIcon,
+  Menu,
+  X
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -28,6 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
 
   const [isReady, setIsReady] = useState<boolean>(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   // حالة الوضع الداكن (Dark Mode)
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -45,6 +48,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     localStorage.setItem('edu_theme', JSON.stringify(isDarkMode));
     window.dispatchEvent(new Event('storage'));
   }, [isDarkMode]);
+
+  // إغلاق القائمة الجانبية تلقائياً على الموبايل عند تغيير الصفحة
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLanguageToggle = () => {
     const newLang = currentLang === 'ar' ? 'en' : 'ar';
@@ -233,9 +241,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* خلفية الجزيئات الثابتة */}
       <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />
 
-      {/* القائمة الجانبية (Sidebar) */}
-      <aside className={`w-64 border-l flex flex-col fixed h-full right-0 top-0 z-30 transition-colors duration-500 ${
-        isDarkMode ? 'bg-slate-900/90 border-slate-800 backdrop-blur-md' : 'bg-white border-gray-200'
+      {/* خلفية شفافة عند فتح القائمة على الموبايل */}
+      {isMobileMenuOpen && (
+        <div 
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="fixed inset-0 bg-black/60 z-30 md:hidden backdrop-blur-sm transition-opacity"
+        />
+      )}
+
+      {/* القائمة الجانبية (Sidebar) - متجاوبة مع كل الشاشات */}
+      <aside className={`w-64 border-l flex flex-col fixed h-full right-0 top-0 z-40 transition-transform duration-300 ${
+        isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'
+      } ${
+        isDarkMode ? 'bg-slate-900/95 border-slate-800 backdrop-blur-md' : 'bg-white border-gray-200'
       }`}>
         
         <div className={`p-4 border-b flex items-center justify-between ${isDarkMode ? 'border-slate-800' : 'border-gray-100'}`}>
@@ -247,6 +265,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {isStudent ? 'بوابة الطالب' : 'منصة تعليم'}
             </span>
           </div>
+          {/* زر إغلاق القائمة في الموبايل */}
+          <button 
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -286,14 +311,25 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </aside>
 
       {/* المحتوى الرئيسي */}
-      <div className="flex-1 mr-64 relative z-10 flex flex-col min-h-screen">
+      <div className="flex-1 md:mr-64 mr-0 relative z-10 flex flex-col min-h-screen transition-all">
         
-        {/* الهيدر العلوي الثابت تماماً (Fixed Header) */}
-        <header className={`h-16 border-b flex items-center justify-between px-8 fixed top-0 left-0 right-0 mr-64 z-40 transition-colors duration-500 ${
+        {/* الهيدر العلوي الثابت - متجاوب مع الشاشات */}
+        <header className={`h-16 border-b flex items-center justify-between px-4 md:px-8 fixed top-0 left-0 right-0 md:mr-64 mr-0 z-30 transition-colors duration-500 ${
           isDarkMode ? 'bg-slate-900/95 border-slate-800 backdrop-blur-md' : 'bg-white/95 border-gray-200 backdrop-blur-md'
         }`}>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
+            {/* زر فتح القائمة الجانبية على الموبايل والتابلت */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className={`md:hidden p-2.5 rounded-xl border transition-colors ${
+                isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-gray-100 border-gray-200 text-gray-800'
+              }`}
+              title="القائمة"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
               className={`p-2.5 rounded-xl transition-all duration-300 transform hover:scale-110 shadow-md flex items-center justify-center ${
@@ -318,7 +354,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className={`text-sm font-medium ${isDarkMode ? 'text-slate-200' : 'text-gray-700'}`}>
+            <span className={`text-sm font-medium hidden sm:inline ${isDarkMode ? 'text-slate-200' : 'text-gray-700'}`}>
               {userProfile.fullName}
             </span>
             <div 
@@ -337,8 +373,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </header>
 
-        {/* محتويات الصفحات (مع مساحة علوية mt-16 لكي لا يختبئ المحتوى تحت الهيدر الثابت) */}
-        <main className="p-8 mt-16 flex-1">
+        {/* محتويات الصفحات */}
+        <main className="p-4 md:p-8 mt-16 flex-1">
           {children}
         </main>
       </div>

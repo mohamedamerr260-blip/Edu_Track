@@ -167,18 +167,21 @@ const Grades: React.FC = () => {
     };
   }, [isDarkMode]);
 
-  // جلب قائمة الطلاب وتصفير الدرجات افتراضياً لو لم يتم إدخالها
   useEffect(() => {
     const fetchStudents = () => {
       const savedStudents = localStorage.getItem('edu_students_list');
       if (savedStudents) {
-        const parsed: Student[] = JSON.parse(savedStudents);
-        const updatedWithGrades = parsed.map(student => ({
-          ...student,
-          gpa: student.gpa || 0,
-          grades: student.grades || { math: 0, science: 0, arabic: 0, english: 0, history: 0, geography: 0 }
-        }));
-        setStudents(updatedWithGrades);
+        try {
+          const parsed: Student[] = JSON.parse(savedStudents);
+          const updatedWithGrades = parsed.map(student => ({
+            ...student,
+            gpa: student.gpa || 0,
+            grades: student.grades || { math: 0, science: 0, arabic: 0, english: 0, history: 0, geography: 0 }
+          }));
+          setStudents(updatedWithGrades);
+        } catch (e) {
+          console.error("Error parsing students", e);
+        }
       } else {
         setStudents([]);
       }
@@ -291,11 +294,11 @@ const Grades: React.FC = () => {
           <div className={`rounded-2xl border p-8 text-center text-gray-400 font-medium backdrop-blur-md ${
             isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-gray-200 shadow-md'
           }`}>
-            لا توجد بيانات درجات متاحة حالياً.
+            لا توجد بيانات درجات متاحة حالياً. تأكد من إضافة طلاب من صفحة إدارة الطلاب.
           </div>
         ) : (
           <>
-            {/* تصميم الكروت للموبايل */}
+            {/* تصميم الكروت للموبايل والتابلت */}
             <div className="grid grid-cols-1 gap-4 md:hidden">
               {filteredStudents.map((student) => {
                 const avg = student.gpa || 0;
@@ -322,6 +325,12 @@ const Grades: React.FC = () => {
                           </span>
                         </div>
                       </div>
+
+                      {!isRestrictedRole && (
+                        <button onClick={() => openEditModal(student)} className={`p-2 rounded-lg transition-colors border ${isDarkMode ? 'border-slate-700 text-blue-400 hover:bg-blue-950/50' : 'border-gray-200 text-blue-600 hover:bg-blue-50'}`} title="تعديل الدرجات">
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-3 gap-2 text-center pt-1 text-xs">
@@ -449,7 +458,7 @@ const Grades: React.FC = () => {
           </>
         )}
 
-        {/* مودال تعديل الدرجات (يظهر للمعلم فقط) */}
+        {/* مودال تعديل الدرجات (يظهر للمعلم فقط عند الضغط على القلم) */}
         {!isRestrictedRole && isEditModalOpen && currentStudent && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 no-print">
             <div className={`rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border ${
@@ -457,7 +466,7 @@ const Grades: React.FC = () => {
             }`}>
               <div className={`p-6 border-b flex items-center justify-between ${isDarkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-gray-50 border-gray-100'}`}>
                 <div>
-                  <h3 className="text-lg font-bold">رصد درجات الطالب</h3>
+                  <h3 className="text-lg font-bold">رصد وتعديل درجات الطالب</h3>
                   <p className="text-xs opacity-70 mt-0.5">الطالب: {currentStudent.firstName} {currentStudent.lastName}</p>
                 </div>
                 <button onClick={() => setIsEditModalOpen(false)} className="opacity-70 hover:opacity-100"><X className="w-5 h-5" /></button>

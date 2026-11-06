@@ -346,70 +346,81 @@ const Attendance: React.FC = () => {
 
         {activeTab === 'daily' ? (
           <div className="space-y-4">
-            {/* تصميم الكروت للشاشات الصغيرة والتابلت، وجداول للكمبيوتر */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredStudents.length === 0 ? (
-                <div className={`col-span-full p-12 text-center rounded-2xl border ${isDarkMode ? 'bg-slate-900/80 border-slate-800 text-slate-400' : 'bg-white border-gray-200 text-gray-500'}`}>
-                  لا يوجد بيانات حضور متاحة حالياً.
-                </div>
-              ) : (
-                filteredStudents.map((student) => (
-                  <div key={student.id} className={`p-4 rounded-2xl border backdrop-blur-md shadow-lg flex flex-col justify-between gap-4 transition-all ${
-                    isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-800'
+            <div className={`rounded-2xl border backdrop-blur-md shadow-xl overflow-x-auto w-full ${
+              isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-700 shadow-md'
+            }`}>
+              <table className="w-full text-center border-collapse min-w-[650px]">
+                <thead>
+                  <tr className={`border-b text-xs md:text-sm font-bold ${
+                    isDarkMode ? 'bg-slate-950/60 border-slate-800 text-slate-300' : 'bg-gray-50 border-gray-100 text-gray-600'
                   }`}>
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border ${
-                          isDarkMode ? 'bg-blue-950/60 border-blue-500/30 text-blue-400' : 'bg-blue-100 border-blue-200 text-blue-600'
-                        }`}>
-                          {student.firstName ? student.firstName.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-sm truncate">{student.firstName} {student.lastName}</h3>
-                          <span className="text-[11px] opacity-60 font-mono">{student.studentId || 'STD-001'}</span>
-                        </div>
-                      </div>
-                      <span className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border whitespace-nowrap ${
-                        isDarkMode ? 'bg-blue-950/40 border-blue-500/20 text-blue-300' : 'bg-blue-50 border-blue-100 text-blue-600'
-                      }`}>{student.class || 'الصف الثاني الثانوي'}</span>
-                    </div>
-
-                    <div className={`pt-3 border-t flex items-center justify-between ${isDarkMode ? 'border-slate-800' : 'border-gray-100'}`}>
-                      <span className="text-xs font-semibold opacity-70">الحالة اليومية:</span>
-                      {isRestrictedRole ? (
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border ${
-                          student.attendanceStatus === 'present' ? (isDarkMode ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300' : 'bg-emerald-50 border-emerald-500 text-emerald-600') :
-                          student.attendanceStatus === 'late' ? (isDarkMode ? 'bg-amber-950/60 border-amber-500 text-amber-300' : 'bg-amber-50 border-amber-500 text-amber-600') :
-                          (isDarkMode ? 'bg-red-950/60 border-red-500 text-red-300' : 'bg-red-50 border-red-500 text-red-600')
-                        }`}>
-                          {student.attendanceStatus === 'present' ? <CheckCircle className="w-3.5 h-3.5 shrink-0" /> : student.attendanceStatus === 'late' ? <Clock className="w-3.5 h-3.5 shrink-0" /> : <XCircle className="w-3.5 h-3.5 shrink-0" />}
-                          <span>{student.attendanceStatus === 'present' ? 'حاضر ومعتمد' : student.attendanceStatus === 'late' ? 'متأخر' : 'غائب'}</span>
-                        </span>
-                      ) : (
-                        <div className="flex items-center gap-1.5">
-                          <button onClick={() => handleStatusChange(student.id, 'present')} className={`p-2 rounded-xl border text-xs font-bold transition-all ${
-                            student.attendanceStatus === 'present' 
-                              ? (isDarkMode ? 'bg-emerald-950/80 border-emerald-500 text-emerald-300 shadow-sm' : 'bg-emerald-50 border-emerald-500 text-emerald-600 shadow-sm') 
-                              : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50')
-                          }`} title="حاضر"><CheckCircle className="w-4 h-4" /></button>
-                          <button onClick={() => handleStatusChange(student.id, 'late')} className={`p-2 rounded-xl border text-xs font-bold transition-all ${
-                            student.attendanceStatus === 'late' 
-                              ? (isDarkMode ? 'bg-amber-950/80 border-amber-500 text-amber-300 shadow-sm' : 'bg-amber-50 border-amber-500 text-amber-600 shadow-sm') 
-                              : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50')
-                          }`} title="متأخر"><Clock className="w-4 h-4" /></button>
-                          <button onClick={() => handleStatusChange(student.id, 'absent')} className={`p-2 rounded-xl border text-xs font-bold transition-all ${
-                            student.attendanceStatus === 'absent' 
-                              ? (isDarkMode ? 'bg-red-950/80 border-red-500 text-red-300 shadow-sm' : 'bg-red-50 border-red-500 text-red-600 shadow-sm') 
-                              : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50')
-                          }`} title="غائب"><XCircle className="w-4 h-4" /></button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
+                    <th className="p-3 md:p-4 text-right">الطالب</th>
+                    <th className="p-3 md:p-4">الصف</th>
+                    <th className="p-3 md:p-4">{isRestrictedRole ? 'حالة الحضور اليومية' : 'تسجيل الحالة اليومية'}</th>
+                  </tr>
+                </thead>
+                <tbody className={`divide-y text-xs md:text-sm font-medium ${isDarkMode ? 'divide-slate-800 text-slate-200' : 'divide-gray-50 text-gray-700'}`}>
+                  {filteredStudents.length === 0 ? (
+                    <tr><td colSpan={3} className="p-12 text-center text-gray-400">لا يوجد بيانات حضور متاحة حالياً.</td></tr>
+                  ) : (
+                    filteredStudents.map((student) => (
+                      <tr key={student.id} className={`transition-colors ${isDarkMode ? 'hover:bg-slate-800/40' : 'hover:bg-gray-50/40'}`}>
+                        <td className="p-3 md:p-4 text-right">
+                          <div className="flex items-center gap-2.5 justify-start">
+                            <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 border ${
+                              isDarkMode ? 'bg-blue-950/60 border-blue-500/30 text-blue-400' : 'bg-blue-100 border-blue-200 text-blue-600'
+                            }`}>
+                              {student.firstName ? student.firstName.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
+                            </div>
+                            <div className="flex flex-col text-right min-w-0">
+                              <div className="font-bold truncate">{student.firstName} {student.lastName}</div>
+                              <div className="text-[10px] md:text-xs opacity-60 font-mono mt-0.5">{student.studentId || 'STD-001'}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-3 md:p-4">
+                          <span className={`px-2.5 py-1 rounded-lg text-[11px] md:text-xs font-bold border whitespace-nowrap ${
+                            isDarkMode ? 'bg-blue-950/40 border-blue-500/20 text-blue-300' : 'bg-blue-50 border-blue-100 text-blue-600'
+                          }`}>{student.class || 'الصف الثاني الثانوي'}</span>
+                        </td>
+                        <td className="p-3 md:p-4">
+                          {isRestrictedRole ? (
+                            <div className="flex items-center justify-center">
+                              <span className={`inline-flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-xs font-bold border ${
+                                student.attendanceStatus === 'present' ? (isDarkMode ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300' : 'bg-emerald-50 border-emerald-500 text-emerald-600') :
+                                student.attendanceStatus === 'late' ? (isDarkMode ? 'bg-amber-950/60 border-amber-500 text-amber-300' : 'bg-amber-50 border-amber-500 text-amber-600') :
+                                (isDarkMode ? 'bg-red-950/60 border-red-500 text-red-300' : 'bg-red-50 border-red-500 text-red-600')
+                              }`}>
+                                {student.attendanceStatus === 'present' ? <CheckCircle className="w-3.5 h-3.5 shrink-0" /> : student.attendanceStatus === 'late' ? <Clock className="w-3.5 h-3.5 shrink-0" /> : <XCircle className="w-3.5 h-3.5 shrink-0" />}
+                                <span>{student.attendanceStatus === 'present' ? 'حاضر ومعتمد' : student.attendanceStatus === 'late' ? 'متأخر' : 'غائب'}</span>
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center gap-1.5 md:gap-2">
+                              <button onClick={() => handleStatusChange(student.id, 'present')} className={`flex items-center gap-1 px-2.5 md:px-3 py-1.5 rounded-xl border text-[11px] md:text-xs font-bold transition-all ${
+                                student.attendanceStatus === 'present' 
+                                  ? (isDarkMode ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300 shadow-sm' : 'bg-emerald-50 border-emerald-500 text-emerald-600 shadow-sm') 
+                                  : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50')
+                              }`}><CheckCircle className="w-3.5 h-3.5 shrink-0" /><span>حاضر</span></button>
+                              <button onClick={() => handleStatusChange(student.id, 'late')} className={`flex items-center gap-1 px-2.5 md:px-3 py-1.5 rounded-xl border text-[11px] md:text-xs font-bold transition-all ${
+                                student.attendanceStatus === 'late' 
+                                  ? (isDarkMode ? 'bg-amber-950/60 border-amber-500 text-amber-300 shadow-sm' : 'bg-amber-50 border-amber-500 text-amber-600 shadow-sm') 
+                                  : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50')
+                              }`}><Clock className="w-3.5 h-3.5 shrink-0" /><span>متأخر</span></button>
+                              <button onClick={() => handleStatusChange(student.id, 'absent')} className={`flex items-center gap-1 px-2.5 md:px-3 py-1.5 rounded-xl border text-[11px] md:text-xs font-bold transition-all ${
+                                student.attendanceStatus === 'absent' 
+                                  ? (isDarkMode ? 'bg-red-950/60 border-red-500 text-red-300 shadow-sm' : 'bg-red-50 border-red-500 text-red-600 shadow-sm') 
+                                  : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50')
+                              }`}><XCircle className="w-3.5 h-3.5 shrink-0" /><span>غائب</span></button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
-
             {!isRestrictedRole && filteredStudents.length > 0 && (
               <div className="flex justify-end pt-2">
                 <button onClick={handleSaveAttendance} className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-2.5 md:py-3 px-5 md:px-6 rounded-xl transition-all shadow-md text-xs md:text-sm"><Save className="w-4 h-4 md:w-5 md:h-5 shrink-0" /><span>حفظ سجل الحضور اليومي</span></button>
@@ -417,55 +428,60 @@ const Attendance: React.FC = () => {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredStudents.length === 0 ? (
-              <div className={`col-span-full p-12 text-center rounded-2xl border ${isDarkMode ? 'bg-slate-900/80 border-slate-800 text-slate-400' : 'bg-white border-gray-200 text-gray-500'}`}>
-                لا يوجد بيانات لعرضها.
-              </div>
-            ) : (
-              filteredStudents.map((student) => {
-                const totalDays = 22;
-                const presentDays = Math.round(((student.attendanceRate || 0) / 100) * totalDays);
-                const absentDays = totalDays - presentDays;
-                return (
-                  <div key={student.id} className={`p-4 rounded-2xl border backdrop-blur-md shadow-lg flex flex-col justify-between gap-4 transition-all ${
-                    isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-800'
-                  }`}>
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border ${
-                          isDarkMode ? 'bg-blue-950/60 border-blue-500/30 text-blue-400' : 'bg-blue-100 border-blue-200 text-blue-600'
-                        }`}>
-                          {student.firstName ? student.firstName.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-sm truncate">{student.firstName} {student.lastName}</h3>
-                          <span className="text-[11px] opacity-60 font-mono">{student.studentId || 'STD-001'}</span>
-                        </div>
-                      </div>
-                      <span className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border whitespace-nowrap ${
-                        isDarkMode ? 'bg-blue-950/40 border-blue-500/20 text-blue-300' : 'bg-blue-50 border-blue-100 text-blue-600'
-                      }`}>{student.class || 'الصف الثاني الثانوي'}</span>
-                    </div>
-
-                    <div className={`pt-3 border-t space-y-2 text-xs ${isDarkMode ? 'border-slate-800 text-slate-300' : 'border-gray-100 text-gray-600'}`}>
-                      <div className="flex justify-between items-center">
-                        <span>إجمالي أيام الحضور:</span>
-                        <span className="text-emerald-500 font-bold">{presentDays} يوم</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span>أيام الغياب:</span>
-                        <span className="text-red-400 font-bold">{absentDays} يوم</span>
-                      </div>
-                      <div className="flex justify-between items-center pt-1 border-t border-dashed border-gray-500/20">
-                        <span className="font-semibold">نسبة الالتزام ({ALL_MONTHS[monthIndex]}):</span>
-                        <span className="px-2.5 py-1 rounded-full text-xs font-bold border bg-blue-500/10 border-blue-500/30 text-blue-400">{student.attendanceRate || 0}%</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            )}
+          <div className={`rounded-2xl border backdrop-blur-md shadow-xl overflow-x-auto w-full ${
+            isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-700 shadow-md'
+          }`}>
+            <table className="w-full text-center border-collapse min-w-[700px]">
+              <thead>
+                <tr className={`border-b text-xs md:text-sm font-bold ${
+                  isDarkMode ? 'bg-slate-950/60 border-slate-800 text-slate-300' : 'bg-gray-50 border-gray-100 text-gray-600'
+                }`}>
+                  <th className="p-3 md:p-4 text-right">الطالب</th>
+                  <th className="p-3 md:p-4">الصف</th>
+                  <th className="p-3 md:p-4">إجمالي أيام الحضور</th>
+                  <th className="p-3 md:p-4">أيام الغياب</th>
+                  <th className="p-3 md:p-4">نسبة الالتزام ({ALL_MONTHS[monthIndex]})</th>
+                </tr>
+              </thead>
+              <tbody className={`divide-y text-xs md:text-sm font-medium ${isDarkMode ? 'divide-slate-800 text-slate-200' : 'divide-gray-50 text-gray-700'}`}>
+                {filteredStudents.length === 0 ? (
+                  <tr><td colSpan={5} className="p-12 text-center text-gray-400">لا يوجد بيانات لعرضها.</td></tr>
+                ) : (
+                  filteredStudents.map((student) => {
+                    const totalDays = 22;
+                    const presentDays = Math.round(((student.attendanceRate || 0) / 100) * totalDays);
+                    const absentDays = totalDays - presentDays;
+                    return (
+                      <tr key={student.id} className={`transition-colors ${isDarkMode ? 'hover:bg-slate-800/40' : 'hover:bg-gray-50/40'}`}>
+                        <td className="p-3 md:p-4 text-right">
+                          <div className="flex items-center gap-2.5 justify-start">
+                            <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 border ${
+                              isDarkMode ? 'bg-blue-950/60 border-blue-500/30 text-blue-400' : 'bg-blue-100 border-blue-200 text-blue-600'
+                            }`}>
+                              {student.firstName ? student.firstName.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
+                            </div>
+                            <div className="flex flex-col text-right min-w-0">
+                              <div className="font-bold truncate">{student.firstName} {student.lastName}</div>
+                              <div className="text-[10px] md:text-xs opacity-60 font-mono mt-0.5">{student.studentId || 'STD-001'}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-3 md:p-4">
+                          <span className={`px-2.5 py-1 rounded-lg text-[11px] md:text-xs font-bold border whitespace-nowrap ${
+                            isDarkMode ? 'bg-blue-950/40 border-blue-500/20 text-blue-300' : 'bg-blue-50 border-blue-100 text-blue-600'
+                          }`}>{student.class || 'الصف الثاني الثانوي'}</span>
+                        </td>
+                        <td className="p-3 md:p-4 text-emerald-500 font-bold">{presentDays} يوم</td>
+                        <td className="p-3 md:p-4 text-red-400 font-bold">{absentDays} يوم</td>
+                        <td className="p-3 md:p-4"><div className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold border ${
+                          isDarkMode ? 'bg-blue-950/50 border-blue-500/30 text-blue-300' : 'bg-blue-50 border-blue-200 text-blue-600'
+                        }`}>{student.attendanceRate || 0}%</div></td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
           </div>
         )}
 

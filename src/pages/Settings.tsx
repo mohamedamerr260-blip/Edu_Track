@@ -28,6 +28,7 @@ interface UserProfile {
   avatar: string;
 }
 
+
 const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications' | 'system'>('profile');
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);

@@ -218,8 +218,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { text: 'الإعدادات', icon: <Settings className="w-5 h-5" />, path: '/settings' },
   ];
 
+  // القائمة المخصصة لولي الأمر (بدون الصفحات الزيادة)
+  const parentMenuItems = [
+    { text: 'لوحة التحكم', icon: <LayoutDashboard className="w-5 h-5" />, path: '/dashboard' },
+    { text: 'درجات الابن', icon: <FileSpreadsheet className="w-5 h-5" />, path: '/grades' },
+    { text: 'سجل الحضور', icon: <CalendarCheck className="w-5 h-5" />, path: '/attendance' },
+    { text: 'الرسائل والمراسلة', icon: <MessageSquare className="w-5 h-5" />, path: '/communication' },
+    { text: 'الإعدادات', icon: <Settings className="w-5 h-5" />, path: '/settings' },
+  ];
+
   const isStudent = userRole === 'student' || userRole === 'STUDENT';
-  const menuItems = isStudent ? studentMenuItems : teacherMenuItems;
+  const isParent = userRole === 'parent' || userRole === 'PARENT';
+
+  let menuItems = teacherMenuItems;
+  if (isStudent) {
+    menuItems = studentMenuItems;
+  } else if (isParent) {
+    menuItems = parentMenuItems;
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('current_user');
@@ -249,7 +265,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         />
       )}
 
-      {/* القائمة الجانبية (Sidebar) - متجاوبة مع كل الشاشات */}
+      {/* القائمة الجانبية (Sidebar) */}
       <aside className={`w-64 border-l flex flex-col fixed h-full right-0 top-0 z-40 transition-transform duration-300 ${
         isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'
       } ${
@@ -262,10 +278,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <BookOpen className="w-5 h-5" />
             </div>
             <span className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-              {isStudent ? 'بوابة الطالب' : 'منصة تعليم'}
+              {isStudent ? 'بوابة الطالب' : isParent ? 'بوابة ولي الأمر' : 'منصة تعليم'}
             </span>
           </div>
-          {/* زر إغلاق القائمة في الموبايل */}
           <button 
             onClick={() => setIsMobileMenuOpen(false)}
             className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
@@ -313,13 +328,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* المحتوى الرئيسي */}
       <div className="flex-1 md:mr-64 mr-0 relative z-10 flex flex-col min-h-screen transition-all">
         
-        {/* الهيدر العلوي الثابت - متجاوب مع الشاشات */}
+        {/* الهيدر العلوي الثابت */}
         <header className={`h-16 border-b flex items-center justify-between px-4 md:px-8 fixed top-0 left-0 right-0 md:mr-64 mr-0 z-30 transition-colors duration-500 ${
           isDarkMode ? 'bg-slate-900/95 border-slate-800 backdrop-blur-md' : 'bg-white/95 border-gray-200 backdrop-blur-md'
         }`}>
           
           <div className="flex items-center gap-2 md:gap-3">
-            {/* زر فتح القائمة الجانبية على الموبايل والتابلت */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={`md:hidden p-2.5 rounded-xl border transition-colors ${
@@ -339,17 +353,38 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               }`}
               title="تبديل الوضع"
             >
-              {isDarkMode ? <Moon className="w-4 h-4 text-indigo-300" /> : <Sun className="w-4 h-4 text-amber-400" />}
+              {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> :  <Moon className="w-4 h-4 text-indigo-300"/>}
             </button>
 
+            {/* زر تبديل اللغة */}
             <button
               onClick={handleLanguageToggle}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all duration-300 transform hover:scale-105 shadow-md ${
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold border transition-all duration-300 transform hover:scale-105 shadow-md shrink-0 ${
                 isDarkMode ? 'bg-slate-800/80 border-slate-700 text-slate-200 hover:bg-slate-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
-              <Globe className="w-4 h-4 text-blue-500" />
-              <span>{currentLang === 'ar' ? 'EN 🇬🇧' : 'AR 🇸🇦'}</span>
+              <Globe className="w-4 h-4 text-blue-500 shrink-0" />
+              <div className="inline-flex items-center gap-1.5">
+                {currentLang === 'ar' ? (
+                  <>
+                    <span className="font-bold">EN</span>
+                    <img 
+                      src="https://flagcdn.com/w40/gb.png" 
+                      alt="UK Flag" 
+                      className="w-5 h-3.5 object-cover rounded shadow-sm"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <span className="font-bold">AR</span>
+                    <img 
+                      src="https://flagcdn.com/w40/eg.png" 
+                      alt="Egypt Flag" 
+                      className="w-5 h-3.5 object-cover rounded shadow-sm"
+                    />
+                  </>
+                )}
+              </div>
             </button>
           </div>
 

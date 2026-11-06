@@ -21,7 +21,6 @@ const Students: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // حالة المود (الداكن / الفاتح) المتزامنة مع الهيدر
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem('edu_theme');
     return saved !== null ? JSON.parse(saved) : true;
@@ -37,7 +36,6 @@ const Students: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // تأثير جزيئات الخلفية المتحركة (تهرب ببطء شديد وبنعومة من الماوس)
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -97,12 +95,9 @@ const Students: React.FC = () => {
         if (distance < mouse.radius) {
           const force = (mouse.radius - distance) / mouse.radius;
           const angle = Math.atan2(dy, dx);
-          
-          // تم تقليل سرعة الهروب لتصبح بطيئة جداً وهادئة (0.06 بدلاً من 0.15)
           p.vx -= Math.cos(angle) * force * 0.01;
           p.vy -= Math.sin(angle) * force * 0.01;
         } else {
-          // رجوع تدريجي وبطيء جداً للسرعة الطبيعية
           p.vx += (p.baseVx - p.vx) * 0.015;
           p.vy += (p.baseVy - p.vy) * 0.015;
         }
@@ -148,7 +143,6 @@ const Students: React.FC = () => {
     };
   }, [isDarkMode]);
 
-  // حقول الفورم
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [studentClass, setStudentClass] = useState('');
@@ -233,158 +227,218 @@ const Students: React.FC = () => {
 
   return (
     <Layout>
-      {/* خلفية الجزيئات ثابتة في الخلف */}
       <canvas 
         ref={canvasRef} 
         className="fixed inset-0 pointer-events-none z-0" 
       />
 
-      <div className="relative z-10 space-y-6 text-right pb-10" dir="rtl">
+      <div className="relative z-10 space-y-6 text-right pb-10 px-2 sm:px-0" dir="rtl">
         
         {/* الترويسة */}
-        <div className={`flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4 ${isDarkMode ? 'border-slate-800' : 'border-gray-200'}`}>
+        <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b pb-4 ${isDarkMode ? 'border-slate-800' : 'border-gray-200'}`}>
           <div>
-            <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>إدارة الطلاب</h1>
-            <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>عرض وإدارة بيانات الطلاب والتحكم بها</p>
+            <h1 className={`text-2xl sm:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>إدارة الطلاب</h1>
+            <p className={`text-xs sm:text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>عرض وإدارة بيانات الطلاب والتحكم بها</p>
           </div>
-          <button onClick={openAddModal} className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-2.5 px-5 rounded-xl transition-all shadow-md shadow-blue-600/20">
-            <Plus className="w-5 h-5" />
+          <button onClick={openAddModal} className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md text-xs sm:text-sm">
+            <Plus className="w-4 h-4" />
             <span>إضافة طالب</span>
           </button>
         </div>
 
-        {/* شريط البحث والفلتر */}
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className={`p-3 rounded-xl border flex items-center gap-3 w-full md:max-w-md backdrop-blur-md shadow-sm ${
+        {/* البحث والفلتر */}
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+          <div className={`p-2.5 rounded-xl border flex items-center gap-3 w-full sm:max-w-md backdrop-blur-md shadow-sm ${
             isDarkMode ? 'bg-slate-900/80 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-800'
           }`}>
-            <Search className="text-gray-400 w-5 h-5" />
+            <Search className="text-gray-400 w-4 h-4 shrink-0" />
             <input 
               type="text" 
               placeholder="البحث عن طالب..." 
               value={searchTerm} 
               onChange={(e) => setSearchTerm(e.target.value)} 
-              className="w-full bg-transparent border-none focus:outline-none text-sm placeholder:text-gray-400" 
+              className="w-full bg-transparent border-none focus:outline-none text-xs sm:text-sm placeholder:text-gray-400" 
             />
           </div>
 
-          <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-md shadow-sm w-full md:w-auto ${
+          <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border backdrop-blur-md shadow-sm w-full sm:w-auto ${
             isDarkMode ? 'bg-slate-900/80 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-700'
           }`}>
-            <SlidersHorizontal className="w-4 h-4 text-gray-400" />
-            <select value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)} className="bg-transparent text-sm focus:outline-none cursor-pointer font-medium">
+            <SlidersHorizontal className="w-4 h-4 text-gray-400 shrink-0" />
+            <select value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)} className="bg-transparent text-xs sm:text-sm focus:outline-none cursor-pointer font-medium w-full">
               <option value="all" className={isDarkMode ? 'bg-slate-900 text-white' : ''}>جميع الصفوف</option>
               {uniqueClasses.map((c, i) => <option key={i} value={c} className={isDarkMode ? 'bg-slate-900 text-white' : ''}>{c}</option>)}
             </select>
           </div>
         </div>
 
-        {/* جدول الطلاب */}
-        <div className={`rounded-2xl border backdrop-blur-md shadow-xl overflow-hidden ${
-          isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-700 shadow-md'
-        }`}>
-          <div className="overflow-x-auto">
-            <table className="w-full text-right border-collapse">
-              <thead>
-                <tr className={`border-b text-sm font-semibold ${
-                  isDarkMode ? 'bg-slate-950/60 border-slate-800 text-slate-300' : 'bg-gray-50 border-gray-200 text-gray-600'
+        {/* عرض الطلاب: كروت منفصلة على الموبايل (Grid/Cards) وتصميم جدول على الشاشات الكبيرة */}
+        {filteredStudents.length === 0 ? (
+          <div className={`rounded-2xl border p-8 text-center text-gray-400 font-medium backdrop-blur-md ${
+            isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-gray-200 shadow-md'
+          }`}>
+            لا يوجد طلاب مسجلين حالياً.
+          </div>
+        ) : (
+          <>
+            {/* تصميم الكروت للموبايل (يظهر فقط على الشاشات الصغيرة ويختفي في الشاشات الكبيرة) */}
+            <div className="grid grid-cols-1 gap-4 md:hidden">
+              {filteredStudents.map((student) => (
+                <div key={student.id} className={`p-4 rounded-2xl border backdrop-blur-md shadow-lg space-y-3 ${
+                  isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-800'
                 }`}>
-                  <th className="p-4">الاسم</th>
-                  <th className="p-4">الصف</th>
-                  <th className="p-4">الرقم التعريفي</th>
-                  <th className="p-4">البريد الإلكتروني</th>
-                  <th className="p-4">الحضور</th>
-                  <th className="p-4">المتوسط</th>
-                  <th className="p-4 text-center">الإجراءات</th>
-                </tr>
-              </thead>
-              <tbody className={`divide-y text-sm ${isDarkMode ? 'divide-slate-800 text-slate-200' : 'divide-gray-100 text-gray-700'}`}>
-                {filteredStudents.length === 0 ? (
-                  <tr><td colSpan={7} className="p-8 text-center text-gray-400 font-medium">لا يوجد طلاب مسجلين حالياً.</td></tr>
-                ) : (
-                  filteredStudents.map((student) => (
-                    <tr key={student.id} className={`transition-colors ${isDarkMode ? 'hover:bg-slate-800/40' : 'hover:bg-gray-50/50'}`}>
-                      <td className="p-4 font-semibold">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border ${
-                            isDarkMode ? 'bg-blue-950/60 border-blue-500/30 text-blue-400' : 'bg-blue-100 border-blue-200 text-blue-600'
-                          }`}>
-                            {student.firstName ? student.firstName.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
-                          </div>
-                          <span>{student.firstName} {student.lastName}</span>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-lg text-xs font-medium border ${
+                  <div className="flex items-center justify-between border-b pb-3 border-slate-700/50">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border ${
+                        isDarkMode ? 'bg-blue-950/60 border-blue-500/30 text-blue-400' : 'bg-blue-100 border-blue-200 text-blue-600'
+                      }`}>
+                        {student.firstName ? student.firstName.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-base">{student.firstName} {student.lastName}</h3>
+                        <span className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-medium border mt-0.5 ${
                           isDarkMode ? 'bg-blue-950/40 border-blue-500/20 text-blue-300' : 'bg-blue-50 border-blue-100 text-blue-600'
                         }`}>
-                          {student.class}
+                          الصف: {student.class}
                         </span>
-                      </td>
-                      <td className="p-4 opacity-75 font-mono">{student.studentId}</td>
-                      <td className="p-4 opacity-75">{student.email}</td>
-                      <td className="p-4 font-medium">{student.attendance}%</td>
-                      <td className="p-4 font-semibold">{student.gpa.toFixed(2)}</td>
-                      <td className="p-4">
-                        <div className="flex items-center justify-center gap-2">
-                          <button onClick={() => openEditModal(student)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-blue-400 hover:bg-blue-950/50' : 'text-blue-600 hover:bg-blue-50'}`}><Pencil className="w-4 h-4" /></button>
-                          <button onClick={() => handleDeleteStudent(student.id)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-red-400 hover:bg-red-950/50' : 'text-red-600 hover:bg-red-50'}`}><Trash2 className="w-4 h-4" /></button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => openEditModal(student)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-blue-400 hover:bg-blue-950/50' : 'text-blue-600 hover:bg-blue-50'}`}><Pencil className="w-4 h-4" /></button>
+                      <button onClick={() => handleDeleteStudent(student.id)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-red-400 hover:bg-red-950/50' : 'text-red-600 hover:bg-red-50'}`}><Trash2 className="w-4 h-4" /></button>
+                    </div>
+                  </div>
 
-        {/* مودال إضافة طالب */}
+                  <div className="grid grid-cols-2 gap-2 text-xs pt-1">
+                    <div className="opacity-80">
+                      <span className="block font-semibold opacity-60">الرقم التعريفي:</span>
+                      <span className="font-mono text-sm">{student.studentId}</span>
+                    </div>
+                    <div className="opacity-80 text-left">
+                      <span className="block font-semibold opacity-60">البريد الإلكتروني:</span>
+                      <span className="truncate block text-xs">{student.email}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-700/50 text-xs">
+                    <div>
+                      <span className="opacity-60">الحضور: </span>
+                      <span className="font-bold text-emerald-400">{student.attendance}%</span>
+                    </div>
+                    <div>
+                      <span className="opacity-60">المعدل: </span>
+                      <span className="font-bold text-purple-400">{student.gpa.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* تصميم الجدول التقليدي (يظهر فقط على الشاشات المتوسطة والكبيرة مثل اللاب توب والتابلت) */}
+            <div className={`hidden md:block rounded-2xl border backdrop-blur-md shadow-xl overflow-hidden ${
+              isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-700 shadow-md'
+            }`}>
+              <div className="overflow-x-auto">
+                <table className="w-full text-right border-collapse">
+                  <thead>
+                    <tr className={`border-b text-sm font-semibold ${
+                      isDarkMode ? 'bg-slate-950/60 border-slate-800 text-slate-300' : 'bg-gray-50 border-gray-200 text-gray-600'
+                    }`}>
+                      <th className="p-4">الاسم</th>
+                      <th className="p-4">الصف</th>
+                      <th className="p-4">الرقم التعريفي</th>
+                      <th className="p-4">البريد الإلكتروني</th>
+                      <th className="p-4">الحضور</th>
+                      <th className="p-4">المتوسط</th>
+                      <th className="p-4 text-center">الإجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y text-sm ${isDarkMode ? 'divide-slate-800 text-slate-200' : 'divide-gray-100 text-gray-700'}`}>
+                    {filteredStudents.map((student) => (
+                      <tr key={student.id} className={`transition-colors ${isDarkMode ? 'hover:bg-slate-800/40' : 'hover:bg-gray-50/50'}`}>
+                        <td className="p-4 font-semibold">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border ${
+                              isDarkMode ? 'bg-blue-950/60 border-blue-500/30 text-blue-400' : 'bg-blue-100 border-blue-200 text-blue-600'
+                            }`}>
+                              {student.firstName ? student.firstName.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
+                            </div>
+                            <span>{student.firstName} {student.lastName}</span>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-lg text-xs font-medium border ${
+                            isDarkMode ? 'bg-blue-950/40 border-blue-500/20 text-blue-300' : 'bg-blue-50 border-blue-100 text-blue-600'
+                          }`}>
+                            {student.class}
+                          </span>
+                        </td>
+                        <td className="p-4 opacity-75 font-mono">{student.studentId}</td>
+                        <td className="p-4 opacity-75">{student.email}</td>
+                        <td className="p-4 font-medium">{student.attendance}%</td>
+                        <td className="p-4 font-semibold">{student.gpa.toFixed(2)}</td>
+                        <td className="p-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <button onClick={() => openEditModal(student)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-blue-400 hover:bg-blue-950/50' : 'text-blue-600 hover:bg-blue-50'}`}><Pencil className="w-4 h-4" /></button>
+                            <button onClick={() => handleDeleteStudent(student.id)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-red-400 hover:bg-red-950/50' : 'text-red-600 hover:bg-red-50'}`}><Trash2 className="w-4 h-4" /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* المودال */}
         {isAddModalOpen && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className={`rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border ${
+            <div className={`rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border max-h-[90vh] overflow-y-auto ${
               isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-900'
             }`}>
-              <div className={`p-6 border-b flex items-center justify-between ${isDarkMode ? 'border-slate-800' : 'border-gray-100'}`}>
-                <h3 className="text-xl font-bold">إضافة طالب جديد</h3>
+              <div className={`p-4 sm:p-6 border-b flex items-center justify-between sticky top-0 backdrop-blur-md z-10 ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-gray-100'}`}>
+                <h3 className="text-lg sm:text-xl font-bold">إضافة طالب جديد</h3>
                 <button onClick={() => setIsAddModalOpen(false)} className="opacity-70 hover:opacity-100"><X className="w-5 h-5" /></button>
               </div>
-              <form onSubmit={handleAddStudent} className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleAddStudent} className="p-4 sm:p-6 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold mb-1 opacity-80">الاسم الأول</label>
-                    <input type="text" required value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="أدخل الاسم الأول" className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none ${
+                    <input type="text" required value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="أدخل الاسم الأول" className={`w-full border rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none ${
                       isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'
                     }`} />
                   </div>
                   <div>
                     <label className="block text-xs font-bold mb-1 opacity-80">الاسم الأخير</label>
-                    <input type="text" required value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="أدخل الاسم الأخير" className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none ${
+                    <input type="text" required value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="أدخل الاسم الأخير" className={`w-full border rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none ${
                       isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'
                     }`} />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-bold mb-1 opacity-80">الصف</label>
-                  <input type="text" required value={studentClass} onChange={(e) => setStudentClass(e.target.value)} placeholder="مثال: 10-أ" className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none ${
+                  <input type="text" required value={studentClass} onChange={(e) => setStudentClass(e.target.value)} placeholder="مثال: 10-أ" className={`w-full border rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none ${
                     isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'
                   }`} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold mb-1 opacity-80">الرقم التعريفي</label>
-                  <input type="text" required value={studentId} onChange={(e) => setStudentId(e.target.value)} placeholder="مثال: STD2024001" className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none ${
+                  <input type="text" required value={studentId} onChange={(e) => setStudentId(e.target.value)} placeholder="مثال: STD2024001" className={`w-full border rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none ${
                     isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'
                   }`} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold mb-1 opacity-80">البريد الإلكتروني لولي الأمر</label>
-                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="parent@example.com" className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none ${
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="parent@example.com" className={`w-full border rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none ${
                     isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'
                   }`} dir="ltr" />
                 </div>
                 <div className="pt-4 flex gap-3">
-                  <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow-md">إضافة الطالب</button>
-                  <button type="button" onClick={() => setIsAddModalOpen(false)} className={`flex-1 font-semibold py-2.5 rounded-xl text-sm ${
+                  <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-2.5 rounded-xl text-xs sm:text-sm shadow-md">إضافة الطالب</button>
+                  <button type="button" onClick={() => setIsAddModalOpen(false)} className={`flex-1 font-semibold py-2.5 rounded-xl text-xs sm:text-sm ${
                     isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-slate-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}>إلغاء</button>
                 </div>
@@ -393,52 +447,51 @@ const Students: React.FC = () => {
           </div>
         )}
 
-        {/* مودال تعديل بيانات الطالب */}
         {isEditModalOpen && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className={`rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border ${
+            <div className={`rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border max-h-[90vh] overflow-y-auto ${
               isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-900'
             }`}>
-              <div className={`p-6 border-b flex items-center justify-between ${isDarkMode ? 'border-slate-800' : 'border-gray-100'}`}>
-                <h3 className="text-xl font-bold">تعديل بيانات الطالب</h3>
+              <div className={`p-4 sm:p-6 border-b flex items-center justify-between sticky top-0 backdrop-blur-md z-10 ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-gray-100'}`}>
+                <h3 className="text-lg sm:text-xl font-bold">تعديل بيانات الطالب</h3>
                 <button onClick={() => setIsEditModalOpen(false)} className="opacity-70 hover:opacity-100"><X className="w-5 h-5" /></button>
               </div>
-              <form onSubmit={handleEditStudent} className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleEditStudent} className="p-4 sm:p-6 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold mb-1 opacity-80">الاسم الأول</label>
-                    <input type="text" required value={firstName} onChange={(e) => setFirstName(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none ${
+                    <input type="text" required value={firstName} onChange={(e) => setFirstName(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none ${
                       isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'
                     }`} />
                   </div>
                   <div>
                     <label className="block text-xs font-bold mb-1 opacity-80">الاسم الأخير</label>
-                    <input type="text" required value={lastName} onChange={(e) => setLastName(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none ${
+                    <input type="text" required value={lastName} onChange={(e) => setLastName(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none ${
                       isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'
                     }`} />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-bold mb-1 opacity-80">الصف</label>
-                  <input type="text" required value={studentClass} onChange={(e) => setStudentClass(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none ${
+                  <input type="text" required value={studentClass} onChange={(e) => setStudentClass(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none ${
                     isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'
                   }`} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold mb-1 opacity-80">الرقم التعريفي</label>
-                  <input type="text" required value={studentId} onChange={(e) => setStudentId(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none ${
+                  <input type="text" required value={studentId} onChange={(e) => setStudentId(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none ${
                     isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'
                   }`} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold mb-1 opacity-80">البريد الإلكتروني لولي الأمر</label>
-                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none ${
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none ${
                     isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'
                   }`} dir="ltr" />
                 </div>
                 <div className="pt-4 flex gap-3">
-                  <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow-md">حفظ التعديلات</button>
-                  <button type="button" onClick={() => setIsEditModalOpen(false)} className={`flex-1 font-semibold py-2.5 rounded-xl text-sm ${
+                  <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-2.5 rounded-xl text-xs sm:text-sm shadow-md">حفظ التعديلات</button>
+                  <button type="button" onClick={() => setIsEditModalOpen(false)} className={`flex-1 font-semibold py-2.5 rounded-xl text-xs sm:text-sm ${
                     isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-slate-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}>إلغاء</button>
                 </div>

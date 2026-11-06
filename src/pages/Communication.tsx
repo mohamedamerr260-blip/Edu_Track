@@ -41,11 +41,10 @@ interface ChatRoom {
 }
 
 const Communication: React.FC = () => {
-  // التحقق من دور المستخدم الحالي (معلم أم طالب)
   const [userRole, setUserRole] = useState<string>('teacher');
   const [currentUserEmail, setCurrentUserEmail] = useState<string>('');
-  const [currentUserName, setCurrentUserName] = useState<string>('المعلم (أنا)');
-  const [currentUserId, setCurrentUserId] = useState<string>('teacher-main-account');
+  const [currentUserName, setCurrentUserName] = useState<string>('المستخدم');
+  const [currentUserId, setCurrentUserId] = useState<string>('user-main-account');
 
   useEffect(() => {
     try {
@@ -71,6 +70,7 @@ const Communication: React.FC = () => {
   }, []);
 
   const isStudent = userRole === 'student' || userRole === 'STUDENT';
+  const isRestrictedRole = isStudent || userRole === 'parent' || userRole === 'PARENT';
 
   const [allStudents, setAllStudents] = useState<Student[]>([]); 
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
@@ -83,7 +83,6 @@ const Communication: React.FC = () => {
   const [newChatSearch, setNewChatSearch] = useState('');
   const [autoReplyEnabled, setAutoReplyEnabled] = useState(true);
 
-  // حالة المود (الداكن / الفاتح) المتزامنة مع الهيدر
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem('edu_theme');
     return saved !== null ? JSON.parse(saved) : true;
@@ -99,7 +98,6 @@ const Communication: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // تأثير الجزيئات التفاعلية في الخلفية (Canvas)
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -223,12 +221,11 @@ const Communication: React.FC = () => {
     if (savedRooms) {
       try {
         let rooms = JSON.parse(savedRooms) as ChatRoom[];
-        // لو طالب، بنفلتر الغرف بحيث تظهر له غرفته الخاصة فقط إن وجدت
-        if (isStudent) {
+        if (isRestrictedRole) {
           const currentStudentObj = loadedStudents.find(s => s.email && s.email.toLowerCase() === currentUserEmail.toLowerCase()) || loadedStudents[0];
           if (currentStudentObj) {
-            rooms = rooms.filter(r => r.targetId === currentStudentObj.id);
-            // لو مفيش غرفة للشالب، بننشئ له غرفة افتراضية تلقائياً
+            // إذا كان المستخدم طالباً، نجلب فقط الغرفة الخاصة بالطالب المخصصة حصرياً له
+            rooms = rooms.filter(r => r.targetId === currentStudentObj.id && r.type === 'teacher-student');
             if (rooms.length === 0) {
               const defaultRoom: ChatRoom = {
                 id: `teacher-student-${currentStudentObj.id}`,
@@ -251,7 +248,7 @@ const Communication: React.FC = () => {
         console.error("Error loading chat rooms", e);
       }
     } else {
-      if (isStudent && loadedStudents.length > 0) {
+      if (isRestrictedRole && loadedStudents.length > 0) {
         const currentStudentObj = loadedStudents.find(s => s.email && s.email.toLowerCase() === currentUserEmail.toLowerCase()) || loadedStudents[0];
         const defaultRoom: ChatRoom = {
           id: `teacher-student-${currentStudentObj.id}`,
@@ -268,7 +265,7 @@ const Communication: React.FC = () => {
         setChatRooms([]);
       }
     }
-  }, [isStudent, currentUserEmail]);
+  }, [isRestrictedRole, currentUserEmail]);
 
   useEffect(() => {
     if (!activeRoomId) return;
@@ -288,7 +285,7 @@ const Communication: React.FC = () => {
       id: `msg-${Date.now()}`,
       senderId: currentUserId,
       senderName: currentUserName,
-      senderRole: isStudent ? 'student' : 'teacher',
+      senderRole: isStudent ? 'student' : (userRole === 'parent' ? 'parent' : 'teacher'),
       text: textInput.trim(),
       timestamp: Date.now()
     };
@@ -314,10 +311,9 @@ const Communication: React.FC = () => {
 
     setTextInput('');
 
-    // الرد التلقائي الذكي
-    if (autoReplyEnabled && currentRoom && isStudent) {
+    if (autoReplyEnabled && currentRoom && isRestrictedRole) {
       setTimeout(() => {
-        const replyText = 'أهلاً بك يا بني، لقد تلقيت استفسارك وسأقوم بالإجابة عليه وتوضيحه لك قريباً في الحصة القادمة!';
+        const replyText = 'أهلاً بك يا بطل، لقد تلقيت استفسارك وسأقوم بالإجابة عليه وتوضيحه لك قريباً!';
         const autoReplyMessage: Message = {
           id: `msg-reply-${Date.now()}`,
           senderId: 'teacher-main-account',
@@ -405,21 +401,20 @@ const Communication: React.FC = () => {
 
       <div className={`relative z-10 min-h-screen p-4 md:p-6 text-right ${isDarkMode ? 'text-white' : 'text-slate-900'}`} dir="rtl">
         
-        {/* شريط التحكم العلوي */}
         <div className={`rounded-2xl p-4 shadow-xl mb-6 flex flex-wrap items-center justify-between gap-4 backdrop-blur-md border ${
           isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-100'
         }`}>
           <div>
             <h1 className={`text-2xl font-bold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
               <MessageSquare className="w-6 h-6 text-indigo-500" />
-              {isStudent ? '💬 التواصل والاستفسارات مع المعلم' : 'منصة تواصل المعلم الحية (شات فوري)'}
+              {isRestrictedRole ? '💬 التواصل مع المعلم' : 'منصة تواصل المعلم الحية (شات فوري)'}
             </h1>
             <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              {isStudent ? 'اسأل معلمك عن دروسك وتلقى التوجيهات الدراسية مباشرة' : 'محادثات فورية نشطة مع الطلاب وأولياء الأمور مع ردود ذكية تلقائية'}
+              {isRestrictedRole ? 'تواصل مباشرة مع معلم الفصل للاستفسار عن مستواك الدراسي' : 'محادثات فورية نشطة مع الطلاب وأولياء الأمور'}
             </p>
           </div>
           
-          {!isStudent && (
+          {!isRestrictedRole && (
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setAutoReplyEnabled(!autoReplyEnabled)}
@@ -444,12 +439,10 @@ const Communication: React.FC = () => {
           )}
         </div>
 
-        {/* الشات الرئيسي */}
         <div className={`grid grid-cols-1 lg:grid-cols-3 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-md border min-h-[580px] max-h-[720px] ${
           isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200'
         }`}>
           
-          {/* القائمة اليمنى */}
           <div className={`border-l flex flex-col ${isDarkMode ? 'border-slate-800 bg-slate-950/40' : 'border-slate-200 bg-slate-50/50'}`}>
             <div className={`p-4 border-b ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
               <div className="relative">
@@ -504,7 +497,7 @@ const Communication: React.FC = () => {
                         </p>
                       </div>
 
-                      {!isStudent && (
+                      {!isRestrictedRole && (
                         <button
                           onClick={(e) => handleDeleteRoom(room.id, e)}
                           className={`absolute left-2 bottom-2 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity ${
@@ -521,7 +514,6 @@ const Communication: React.FC = () => {
             </div>
           </div>
 
-          {/* القسم الأيسر (عرض المحادثة) */}
           <div className={`lg:col-span-2 flex flex-col ${isDarkMode ? 'bg-slate-950/60' : 'bg-slate-50'}`}>
             {activeRoomId ? (
               <>
@@ -547,7 +539,6 @@ const Communication: React.FC = () => {
                   );
                 })()}
 
-                {/* منطقة الرسائل */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
                   {messages.length === 0 ? (
                     <p className={`text-center text-xs py-8 ${isDarkMode ? 'text-slate-400' : 'text-slate-400'}`}>لا توجد رسائل متبادلة بعد. ابدأ المحادثة الآن!</p>
@@ -556,11 +547,11 @@ const Communication: React.FC = () => {
                       const isMe = msg.senderId === currentUserId;
 
                       return (
-                        <div key={msg.id} className={`flex ${isMe ? 'justify-start' : 'justify-end'}`}>
+                        <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                           <div className={`max-w-[75%] rounded-2xl p-3 shadow-md ${
                             isMe 
-                              ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-br-none' 
-                              : (isDarkMode ? 'bg-slate-900 text-slate-200 border border-slate-800 rounded-bl-none' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-none')
+                              ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-bl-none' 
+                              : (isDarkMode ? 'bg-slate-900 text-slate-200 border border-slate-800 rounded-br-none' : 'bg-white text-slate-800 border border-slate-200 rounded-br-none')
                           }`}>
                             <div className="flex items-center justify-between gap-4 mb-1 border-b border-black/10 pb-1 text-[10px] opacity-90">
                               <span className="font-bold">{msg.senderName}</span>
@@ -577,7 +568,6 @@ const Communication: React.FC = () => {
                   )}
                 </div>
 
-                {/* حقل الإدخال */}
                 <form onSubmit={handleSendMessage} className={`p-4 border-t flex gap-3 items-center ${
                   isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
                 }`}>
@@ -609,8 +599,7 @@ const Communication: React.FC = () => {
           </div>
         </div>
 
-        {/* مودال بدء شات جديد (للمعلم فقط) */}
-        {!isStudent && showNewChatModal && (
+        {!isRestrictedRole && showNewChatModal && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className={`rounded-2xl shadow-2xl max-w-md w-full p-6 max-h-[80vh] flex flex-col border ${
               isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-900'
@@ -651,13 +640,13 @@ const Communication: React.FC = () => {
                       <div className="flex gap-1.5 flex-shrink-0">
                         <button
                           onClick={() => startNewChat(student, 'teacher-student')}
-                          className="px-2.5 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg text-[11px] font-bold border border-blue-500/30 transition-colors"
+                          className="px-2.5 py-1 bg-blue-500/25 hover:bg-blue-500/30 text-blue-300 rounded-lg text-[11px] font-bold border border-blue-500/30 transition-colors"
                         >
                           شات الطالب
                         </button>
                         <button
                           onClick={() => startNewChat(student, 'teacher-parent')}
-                          className="px-2.5 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 rounded-lg text-[11px] font-bold border border-emerald-500/30 transition-colors"
+                          className="px-2.5 py-1 bg-emerald-500/25 hover:bg-emerald-500/30 text-emerald-300 rounded-lg text-[11px] font-bold border border-emerald-500/30 transition-colors"
                         >
                           شات ولي الأمر
                         </button>

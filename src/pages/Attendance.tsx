@@ -25,10 +25,8 @@ const Attendance: React.FC = () => {
   const [selectedClass, setSelectedClass] = useState('all');
   const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]);
   
-  // شريط الشهور المتحرك (يبدأ الافتراضي من يونيو 2026)
   const [monthIndex, setMonthIndex] = useState(5); 
 
-  // التحقق من دور المستخدم الحالي (معلم أم طالب)
   const [userRole, setUserRole] = useState<string>('teacher');
   const [currentUserEmail, setCurrentUserEmail] = useState<string>('');
 
@@ -49,11 +47,9 @@ const Attendance: React.FC = () => {
     }
   }, []);
 
-  // حالات فتح النوافذ المنبثقة للتقويم والإحصائيات
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
 
-  // حالة المود (الداكن / الفاتح) المتزامنة مع الهيدر
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem('edu_theme');
     return saved !== null ? JSON.parse(saved) : true;
@@ -69,7 +65,6 @@ const Attendance: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // تأثير الجزيئات العادية والخطوط الملساء في الخلفية (Canvas)
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -177,22 +172,25 @@ const Attendance: React.FC = () => {
     };
   }, [isDarkMode]);
 
-  //قراءة المزامنة التلقائية مع الـ LocalStorage
   useEffect(() => {
     const savedStudents = localStorage.getItem('edu_students_list');
     if (savedStudents) {
-      const parsed = JSON.parse(savedStudents);
-      const mapped = parsed.map((student: any) => ({
-        id: student.id,
-        firstName: student.firstName,
-        lastName: student.lastName,
-        class: student.class,
-        studentId: student.studentId,
-        email: student.email || '',
-        attendanceStatus: student.attendanceStatus || 'present',
-        attendanceRate: student.attendance || 95
-      }));
-      setStudents(mapped);
+      try {
+        const parsed = JSON.parse(savedStudents);
+        const mapped = parsed.map((student: any) => ({
+          id: student.id || 'std-1',
+          firstName: student.firstName || 'طالب',
+          lastName: student.lastName || '',
+          class: student.class || 'الصف الثاني الثانوي',
+          studentId: student.studentId || 'STD-001',
+          email: student.email || '',
+          attendanceStatus: student.attendanceStatus || 'present',
+          attendanceRate: Number(student.attendance) || 0
+        }));
+        setStudents(mapped);
+      } catch (err) {
+        console.error("Error reading students in attendance", err);
+      }
     }
   }, []);
 
@@ -204,7 +202,10 @@ const Attendance: React.FC = () => {
     if (monthIndex > 0) setMonthIndex(prev => prev - 1);
   };
 
+  const isRestrictedRole = userRole === 'student' || userRole === 'STUDENT' || userRole === 'parent' || userRole === 'PARENT';
+
   const handleStatusChange = (studentId: string, status: 'present' | 'absent' | 'late') => {
+    if (isRestrictedRole) return;
     const updatedStudents = students.map((student) => {
       if (student.id === studentId) {
         let newRate = student.attendanceRate;
@@ -236,45 +237,37 @@ const Attendance: React.FC = () => {
 
   const uniqueClasses = useMemo(() => Array.from(new Set(students.map((s) => s.class))), [students]);
 
-  // تصفية الطلاب حسب الدور (الطالب يرى نفسه فقط، المعلم يرى حسب البحث والفصل أو الكل)
   const filteredStudents = useMemo(() => {
-    const isStudentRole = userRole === 'student' || userRole === 'STUDENT';
-    if (isStudentRole) {
+    if (isRestrictedRole) {
       const myRecord = students.find(s => s.email && s.email.toLowerCase() === currentUserEmail.toLowerCase());
       return myRecord ? [myRecord] : (students.length > 0 ? [students[0]] : []);
     }
     return students.filter((s) => {
-      const matchesSearch = `${s.firstName} ${s.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) || s.studentId.includes(searchTerm);
+      const fullName = `${s.firstName || ''} ${s.lastName || ''}`.toLowerCase();
+      const matchesSearch = fullName.includes(searchTerm.toLowerCase()) || (s.studentId && s.studentId.includes(searchTerm));
       const matchesClass = selectedClass === 'all' || s.class === selectedClass;
       return matchesSearch && matchesClass;
     });
-  }, [students, searchTerm, selectedClass, userRole, currentUserEmail]);
+  }, [students, searchTerm, selectedClass, isRestrictedRole, currentUserEmail]);
 
   const averageTotalAttendance = useMemo(() => {
     if (students.length === 0) return '0.0';
-    const total = students.reduce((sum, s) => sum + s.attendanceRate, 0);
+    const total = students.reduce((sum, s) => sum + (s.attendanceRate || 0), 0);
     return (total / students.length).toFixed(1);
   }, [students]);
 
-  const isStudent = userRole === 'student' || userRole === 'STUDENT';
-
   return (
     <Layout>
-      {/* خلفية الجزيئات الثابتة في الخلف */}
-      <canvas 
-        ref={canvasRef} 
-        className="fixed inset-0 pointer-events-none z-0" 
-      />
+      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />
 
       <div className="relative z-10 space-y-6 text-right pb-10" dir="rtl">
-        {/* هيدر الصفحة وأزرار عرض التقويم والإحصائيات */}
         <div className={`flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4 ${isDarkMode ? 'border-slate-800' : 'border-gray-200'}`}>
           <div>
             <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {isStudent ? 'سجل الحضور والمواظبة الشخصي' : 'تسجيل حضور الطلاب'}
+              {isRestrictedRole ? 'سجل الحضور والمواظبة' : 'تسجيل حضور الطلاب'}
             </h1>
             <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>
-              {isStudent ? 'متابعة سجل حضورك اليومي ونسبة التزامك بالمواظبة المدرسية' : 'إدارة الحضور والغياب اليومي ومتابعة التقارير الشهرية'}
+              {isRestrictedRole ? 'متابعة سجل الحضور اليومي ونسبة التزام الطالب بالمواظبة المدرسية' : 'إدارة الحضور والغياب اليومي ومتابعة التقارير الشهرية'}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -288,12 +281,11 @@ const Attendance: React.FC = () => {
               isDarkMode ? 'bg-slate-900/80 border-slate-700 text-slate-200 hover:bg-slate-800' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
             }`}>
               <BarChart3 className="w-4 h-4 text-emerald-400" />
-              <span>{isStudent ? 'إحصائيات التزامك' : 'إحصائيات الحضور الشهرية'}</span>
+              <span>{isRestrictedRole ? 'إحصائيات التزام الطالب' : 'إحصائيات الحضور الشهرية'}</span>
             </button>
           </div>
         </div>
 
-        {/* أزرار الحضور اليومي والتقرير الشهري */}
         <div className={`flex border-b ${isDarkMode ? 'border-slate-800' : 'border-gray-200'}`}>
           <button onClick={() => setActiveTab('daily')} className={`flex items-center gap-2 py-3 px-6 font-semibold text-sm border-b-2 transition-all ${
             activeTab === 'daily' 
@@ -301,7 +293,7 @@ const Attendance: React.FC = () => {
               : (isDarkMode ? 'border-transparent text-slate-400 hover:text-slate-200' : 'border-transparent text-gray-500 hover:text-gray-700')
           }`}>
             <CalendarIcon className="w-4 h-4" />
-            <span>{isStudent ? 'سجل الحضور اليومي' : 'التسجيل اليومي'}</span>
+            <span>{isRestrictedRole ? 'سجل الحضور اليومي' : 'التسجيل اليومي'}</span>
           </button>
           <button onClick={() => setActiveTab('monthly')} className={`flex items-center gap-2 py-3 px-6 font-semibold text-sm border-b-2 transition-all ${
             activeTab === 'monthly' 
@@ -313,8 +305,7 @@ const Attendance: React.FC = () => {
           </button>
         </div>
 
-        {/* شريط الفلاتر والتحكم (يظهر بحث وفلاتر كاملة للمعلم فقط) */}
-        {!isStudent && (
+        {!isRestrictedRole && (
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className={`p-3 rounded-xl border flex items-center gap-3 w-full md:max-w-md backdrop-blur-md shadow-sm ${
               isDarkMode ? 'bg-slate-900/80 border-slate-800 text-white' : 'bg-white border-gray-100 text-gray-800'
@@ -353,7 +344,6 @@ const Attendance: React.FC = () => {
           </div>
         )}
 
-        {/* عرض الجداول بناء على الاختيار */}
         {activeTab === 'daily' ? (
           <div className="space-y-4">
             <div className={`rounded-2xl border backdrop-blur-md shadow-xl overflow-hidden ${
@@ -366,7 +356,7 @@ const Attendance: React.FC = () => {
                   }`}>
                     <th className="p-4 text-right">الطالب</th>
                     <th className="p-4">الصف</th>
-                    <th className="p-4">{isStudent ? 'حالتك اليومية' : 'تسجيل الحالة اليومية'}</th>
+                    <th className="p-4">{isRestrictedRole ? 'حالة الحضور اليومية' : 'تسجيل الحالة اليومية'}</th>
                   </tr>
                 </thead>
                 <tbody className={`divide-y text-sm font-medium ${isDarkMode ? 'divide-slate-800 text-slate-200' : 'divide-gray-50 text-gray-700'}`}>
@@ -394,7 +384,7 @@ const Attendance: React.FC = () => {
                           }`}>{student.class || 'الصف الثاني الثانوي'}</span>
                         </td>
                         <td className="p-4">
-                          {isStudent ? (
+                          {isRestrictedRole ? (
                             <div className="flex items-center justify-center">
                               <span className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold border ${
                                 student.attendanceStatus === 'present' ? (isDarkMode ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300' : 'bg-emerald-50 border-emerald-500 text-emerald-600') :
@@ -431,7 +421,7 @@ const Attendance: React.FC = () => {
                 </tbody>
               </table>
             </div>
-            {!isStudent && filteredStudents.length > 0 && (
+            {!isRestrictedRole && filteredStudents.length > 0 && (
               <div className="flex justify-end pt-2">
                 <button onClick={handleSaveAttendance} className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md text-sm"><Save className="w-5 h-5" /><span>حفظ سجل الحضور اليومي</span></button>
               </div>
@@ -459,7 +449,7 @@ const Attendance: React.FC = () => {
                 ) : (
                   filteredStudents.map((student) => {
                     const totalDays = 22;
-                    const presentDays = Math.round((student.attendanceRate / 100) * totalDays);
+                    const presentDays = Math.round(((student.attendanceRate || 0) / 100) * totalDays);
                     const absentDays = totalDays - presentDays;
                     return (
                       <tr key={student.id} className={`transition-colors ${isDarkMode ? 'hover:bg-slate-800/40' : 'hover:bg-gray-50/40'}`}>
@@ -485,7 +475,7 @@ const Attendance: React.FC = () => {
                         <td className="p-4 text-red-400 font-bold">{absentDays} يوم</td>
                         <td className="p-4"><div className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold border ${
                           isDarkMode ? 'bg-blue-950/50 border-blue-500/30 text-blue-300' : 'bg-blue-50 border-blue-200 text-blue-600'
-                        }`}>{student.attendanceRate}%</div></td>
+                        }`}>{student.attendanceRate || 0}%</div></td>
                       </tr>
                     );
                   })
@@ -495,7 +485,6 @@ const Attendance: React.FC = () => {
           </div>
         )}
 
-        {/* ===================== منبثق نافذة عرض التقويم الذكي ===================== */}
         {isCalendarOpen && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
             <div className={`rounded-2xl w-full max-w-md shadow-2xl p-6 relative border ${
@@ -514,7 +503,6 @@ const Attendance: React.FC = () => {
           </div>
         )}
 
-        {/* ===================== منبثق نافذة إحصائيات الحضور الشهرية الديناميكية ===================== */}
         {isStatsOpen && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
             <div className={`rounded-2xl w-full max-w-md shadow-2xl p-6 relative border ${
@@ -529,7 +517,7 @@ const Attendance: React.FC = () => {
                   <span className="text-sm font-medium">متوسط حضور المدرسة العام:</span>
                   <span className="text-xl font-black text-emerald-400">{averageTotalAttendance}%</span>
                 </div>
-                {!isStudent && (
+                {!isRestrictedRole && (
                   <div className="grid grid-cols-2 gap-2 text-center text-xs">
                     <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-gray-50 border-gray-200'}`}><div className="text-gray-400 mb-0.5">الطلاب الحاضرين اليوم</div><div className="font-bold text-emerald-400 text-base">{students.filter(s=>s.attendanceStatus === 'present').length}</div></div>
                     <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-gray-50 border-gray-200'}`}><div className="text-gray-400 mb-0.5">الطلاب الغائبين اليوم</div><div className="font-bold text-red-400 text-base">{students.filter(s=>s.attendanceStatus === 'absent').length}</div></div>

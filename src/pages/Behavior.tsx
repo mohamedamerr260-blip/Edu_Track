@@ -14,7 +14,7 @@ interface BehaviorRecord {
   id: string;
   studentId: string;
   studentName: string;
-  studentFirstName?: string; // حقل اختياري لاستخراج الحرف الأول من الاسم بدقة
+  studentFirstName?: string;
   studentClass: string;
   date: string;
   type: 'positive' | 'negative';
@@ -40,7 +40,6 @@ const Behavior: React.FC = () => {
     notes: ''
   });
 
-  // حالة المود (الداكن / الفاتح) المتزامنة مع الهيدر
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem('edu_theme');
     return saved !== null ? JSON.parse(saved) : true;
@@ -56,7 +55,6 @@ const Behavior: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // تأثير الجزيئات العادية والخطوط الملساء في الخلفية (Canvas)
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -164,7 +162,6 @@ const Behavior: React.FC = () => {
     };
   }, [isDarkMode]);
 
-  //قراءة الطلاب الحقيقيين فقط وتصفية السجلات القديمة الوهمية
   useEffect(() => {
     const savedStudents = localStorage.getItem('edu_students_list');
     const actualStudents: Student[] = savedStudents ? JSON.parse(savedStudents) : [];
@@ -245,24 +242,23 @@ const Behavior: React.FC = () => {
 
   return (
     <Layout>
-      {/* خلفية الجزيئات الثابتة في الخلف */}
       <canvas 
         ref={canvasRef} 
         className="fixed inset-0 pointer-events-none z-0" 
       />
 
-      <div className="relative z-10 space-y-6 text-right pb-10" dir="rtl">
-        {/* الهيدر مع أزرار التحكم */}
-        <div className={`flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4 ${isDarkMode ? 'border-slate-800' : 'border-gray-200'}`}>
+      <div className="relative z-10 space-y-6 text-right pb-10 px-2 sm:px-0" dir="rtl">
+        {/* الهيدر */}
+        <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b pb-4 ${isDarkMode ? 'border-slate-800' : 'border-gray-200'}`}>
           <div>
-            <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>إدارة السلوك</h1>
-            <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>تتبع وإدارة سجلات السلوك للطلاب المضافين في السيستم فقط</p>
+            <h1 className={`text-2xl sm:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>إدارة السلوك</h1>
+            <p className={`text-xs sm:text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>تتبع وإدارة سجلات السلوك للطلاب المضافين في السيستم</p>
           </div>
           <div className="flex items-center gap-2">
             {records.length > 0 && (
               <button 
                 onClick={handleClearAllRecords}
-                className={`flex items-center justify-center gap-1.5 font-bold py-2.5 px-4 rounded-xl transition-all text-sm border ${
+                className={`flex items-center justify-center gap-1.5 font-bold py-2.5 px-3 rounded-xl transition-all text-xs sm:text-sm border ${
                   isDarkMode ? 'bg-red-950/40 border-red-900/50 text-red-400 hover:bg-red-900/40' : 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100'
                 }`}
               >
@@ -272,27 +268,27 @@ const Behavior: React.FC = () => {
             )}
             <button 
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-md text-sm"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md text-xs sm:text-sm"
             >
-              <Plus className="w-5 h-5" />
-              <span>إضافة سجل سلوك</span>
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>إضافة سجل</span>
             </button>
           </div>
         </div>
 
         {/* الفلاتر التفاعلية */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className={`p-3 rounded-xl border flex items-center gap-2 backdrop-blur-md shadow-sm ${
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className={`p-2.5 sm:p-3 rounded-xl border flex items-center gap-2 backdrop-blur-md shadow-sm ${
             isDarkMode ? 'bg-slate-900/80 border-slate-800 text-white' : 'bg-white border-gray-100 text-gray-800'
           }`}>
-            <User className="w-4 h-4 text-gray-400" />
+            <User className="w-4 h-4 text-gray-400 shrink-0" />
             <span className="text-xs opacity-70 font-medium whitespace-nowrap">اختر الطالب:</span>
             <select
               value={selectedStudentFilter}
               onChange={(e) => setSelectedStudentFilter(e.target.value)}
-              className="bg-transparent text-sm focus:outline-none cursor-pointer font-bold w-full"
+              className="bg-transparent text-xs sm:text-sm focus:outline-none cursor-pointer font-bold w-full"
             >
-              <option value="all" className={isDarkMode ? 'bg-slate-900 text-white' : ''}>جميع الطلاب المضافين فعلياً</option>
+              <option value="all" className={isDarkMode ? 'bg-slate-900 text-white' : ''}>جميع الطلاب</option>
               {students.map((st) => (
                 <option key={st.id} value={st.studentId} className={isDarkMode ? 'bg-slate-900 text-white' : ''}>
                   {st.firstName} {st.lastName} ({st.class})
@@ -301,22 +297,22 @@ const Behavior: React.FC = () => {
             </select>
           </div>
 
-          <div className={`p-2 rounded-xl border flex items-center justify-between backdrop-blur-md shadow-sm ${
+          <div className={`p-2 rounded-xl border flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 backdrop-blur-md shadow-sm ${
             isDarkMode ? 'bg-slate-900/80 border-slate-800 text-white' : 'bg-white border-gray-100 text-gray-800'
           }`}>
             <span className="text-xs opacity-70 font-medium mr-2">تصفية حسب النوع:</span>
             <div className={`p-1 rounded-lg flex gap-1 ${isDarkMode ? 'bg-slate-950/60' : 'bg-gray-50'}`}>
-              <button onClick={() => setTypeFilter('all')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
+              <button onClick={() => setTypeFilter('all')} className={`flex-1 sm:flex-none px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
                 typeFilter === 'all' 
                   ? (isDarkMode ? 'bg-slate-800 text-blue-400 shadow-sm' : 'bg-white text-blue-600 shadow-sm') 
                   : 'text-gray-400 hover:opacity-100'
               }`}>الكل ({records.length})</button>
-              <button onClick={() => setTypeFilter('positive')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
+              <button onClick={() => setTypeFilter('positive')} className={`flex-1 sm:flex-none px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
                 typeFilter === 'positive' 
                   ? (isDarkMode ? 'bg-emerald-950/60 text-emerald-300 shadow-sm border border-emerald-500/30' : 'bg-emerald-50 text-emerald-600 shadow-sm') 
                   : 'text-gray-400 hover:opacity-100'
               }`}>إيجابي</button>
-              <button onClick={() => setTypeFilter('negative')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
+              <button onClick={() => setTypeFilter('negative')} className={`flex-1 sm:flex-none px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
                 typeFilter === 'negative' 
                   ? (isDarkMode ? 'bg-red-950/60 text-red-300 shadow-sm border border-red-500/30' : 'bg-red-50 text-red-600 shadow-sm') 
                   : 'text-gray-400 hover:opacity-100'
@@ -325,79 +321,149 @@ const Behavior: React.FC = () => {
           </div>
         </div>
 
-        {/* جدول عرض السجلات النظيف */}
-        <div className={`rounded-2xl border backdrop-blur-md shadow-xl overflow-hidden ${
-          isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-700 shadow-md'
-        }`}>
-          <div className="overflow-x-auto">
-            <table className="w-full text-center border-collapse">
-              <thead>
-                <tr className={`border-b text-sm font-bold ${
-                  isDarkMode ? 'bg-slate-950/60 border-slate-800 text-slate-300' : 'bg-gray-50 border-gray-100 text-gray-600'
-                }`}>
-                  <th className="p-4 text-right">التاريخ</th>
-                  <th className="p-4 text-right">الطالب</th>
-                  <th className="p-4">النوع</th>
-                  <th className="p-4">الفئة</th>
-                  <th className="p-4 text-right max-w-xs">الملاحظات</th>
-                  <th className="p-4">النقاط</th>
-                  <th className="p-4">المعلم</th>
-                </tr>
-              </thead>
-              <tbody className={`divide-y text-sm font-medium ${isDarkMode ? 'divide-slate-800 text-slate-200' : 'divide-gray-50 text-gray-700'}`}>
-                {filteredRecords.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="p-12 text-center text-gray-400">لا توجد سجلات سلوك مرصودة. اضغط على "إضافة سجل سلوك" للبدء بالطلاب الذين ضفتهم.</td>
-                  </tr>
-                ) : (
-                  filteredRecords.map((record) => (
-                    <tr key={record.id} className={`transition-colors ${isDarkMode ? 'hover:bg-slate-800/40' : 'hover:bg-gray-50/40'}`}>
-                      <td className="p-4 text-right text-xs opacity-60 font-mono">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5" />
-                          <span>{record.date}</span>
-                        </div>
-                      </td>
-                      <td className="p-4 text-right">
-                        <div className="flex items-center gap-3 justify-start">
-                          <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border ${
-                            isDarkMode ? 'bg-blue-950/60 border-blue-500/30 text-blue-400' : 'bg-blue-100 border-blue-200 text-blue-600'
-                          }`}>
-                            {record.studentFirstName ? record.studentFirstName.charAt(0).toUpperCase() : (record.studentName ? record.studentName.charAt(0).toUpperCase() : <User className="w-4 h-4" />)}
-                          </div>
-                          <div className="flex flex-col text-right">
-                            <div className="font-bold">{record.studentName}</div>
-                            <div className="text-xs opacity-60 font-mono mt-0.5">{record.studentClass}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold border ${
-                          record.type === 'positive' 
-                            ? (isDarkMode ? 'bg-emerald-950/50 border-emerald-500/30 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-600') 
-                            : (isDarkMode ? 'bg-red-950/50 border-red-500/30 text-red-300' : 'bg-red-50 border-red-200 text-red-600')
-                        }`}>
-                          {record.type === 'positive' ? 'إيجابي' : 'سلبي'}
-                        </span>
-                      </td>
-                      <td className="p-4 font-bold">{record.category}</td>
-                      <td className="p-4 text-right text-xs opacity-75 max-w-xs whitespace-normal leading-relaxed">{record.notes}</td>
-                      <td className={`p-4 font-black text-base ${record.points > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                        {record.points > 0 ? `+${record.points}` : record.points}
-                      </td>
-                      <td className="p-4 text-xs opacity-60">{record.teacher}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+        {/* عرض السجلات: كروت للموبايل وجدول للشاشات الكبيرة */}
+        {filteredRecords.length === 0 ? (
+          <div className={`rounded-2xl border p-8 text-center text-gray-400 font-medium backdrop-blur-md ${
+            isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-gray-200 shadow-md'
+          }`}>
+            لا توجد سجلات سلوك مرصودة. اضغط على "إضافة سجل" للبدء.
           </div>
-        </div>
+        ) : (
+          <>
+            {/* تصميم الكروت للموبايل */}
+            <div className="grid grid-cols-1 gap-4 md:hidden">
+              {filteredRecords.map((record) => (
+                <div key={record.id} className={`p-4 rounded-2xl border backdrop-blur-md shadow-lg space-y-3 ${
+                  isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-800'
+                }`}>
+                  <div className="flex items-center justify-between border-b pb-3 border-slate-700/50">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border ${
+                        isDarkMode ? 'bg-blue-950/60 border-blue-500/30 text-blue-400' : 'bg-blue-100 border-blue-200 text-blue-600'
+                      }`}>
+                        {record.studentFirstName ? record.studentFirstName.charAt(0).toUpperCase() : (record.studentName ? record.studentName.charAt(0).toUpperCase() : <User className="w-4 h-4" />)}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-base">{record.studentName}</h3>
+                        <span className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-medium border mt-0.5 ${
+                          isDarkMode ? 'bg-blue-950/40 border-blue-500/20 text-blue-300' : 'bg-blue-50 border-blue-100 text-blue-600'
+                        }`}>
+                          {record.studentClass}
+                        </span>
+                      </div>
+                    </div>
+
+                    <span className={`px-2.5 py-1 rounded-xl text-xs font-bold border ${
+                      record.type === 'positive' 
+                        ? (isDarkMode ? 'bg-emerald-950/50 border-emerald-500/30 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-600') 
+                        : (isDarkMode ? 'bg-red-950/50 border-red-500/30 text-red-300' : 'bg-red-50 border-red-200 text-red-600')
+                    }`}>
+                      {record.type === 'positive' ? 'إيجابي' : 'سلبي'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex justify-between">
+                      <span className="opacity-60 font-semibold">الفئة:</span>
+                      <span className="font-bold">{record.category}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="opacity-60 font-semibold">التاريخ:</span>
+                      <span className="font-mono">{record.date}</span>
+                    </div>
+                    <div className="pt-1">
+                      <span className="block opacity-60 font-semibold mb-1">الملاحظات:</span>
+                      <p className={`p-2.5 rounded-xl text-xs leading-relaxed ${isDarkMode ? 'bg-slate-950/60 text-slate-300' : 'bg-gray-50 text-gray-700'}`}>
+                        {record.notes}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-700/50 text-xs">
+                    <div>
+                      <span className="opacity-60">المعلم: </span>
+                      <span className="font-semibold">{record.teacher}</span>
+                    </div>
+                    <div>
+                      <span className="opacity-60">النقاط: </span>
+                      <span className={`font-black text-sm ${record.points > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {record.points > 0 ? `+${record.points}` : record.points}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* تصميم الجدول للشاشات الكبيرة والمتوسطة */}
+            <div className={`hidden md:block rounded-2xl border backdrop-blur-md shadow-xl overflow-hidden ${
+              isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-700 shadow-md'
+            }`}>
+              <div className="overflow-x-auto">
+                <table className="w-full text-center border-collapse">
+                  <thead>
+                    <tr className={`border-b text-sm font-bold ${
+                      isDarkMode ? 'bg-slate-950/60 border-slate-800 text-slate-300' : 'bg-gray-50 border-gray-100 text-gray-600'
+                    }`}>
+                      <th className="p-4 text-right">التاريخ</th>
+                      <th className="p-4 text-right">الطالب</th>
+                      <th className="p-4">النوع</th>
+                      <th className="p-4">الفئة</th>
+                      <th className="p-4 text-right max-w-xs">الملاحظات</th>
+                      <th className="p-4">النقاط</th>
+                      <th className="p-4">المعلم</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y text-sm font-medium ${isDarkMode ? 'divide-slate-800 text-slate-200' : 'divide-gray-50 text-gray-700'}`}>
+                    {filteredRecords.map((record) => (
+                      <tr key={record.id} className={`transition-colors ${isDarkMode ? 'hover:bg-slate-800/40' : 'hover:bg-gray-50/40'}`}>
+                        <td className="p-4 text-right text-xs opacity-60 font-mono">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span>{record.date}</span>
+                          </div>
+                        </td>
+                        <td className="p-4 text-right">
+                          <div className="flex items-center gap-3 justify-start">
+                            <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border ${
+                              isDarkMode ? 'bg-blue-950/60 border-blue-500/30 text-blue-400' : 'bg-blue-100 border-blue-200 text-blue-600'
+                            }`}>
+                              {record.studentFirstName ? record.studentFirstName.charAt(0).toUpperCase() : (record.studentName ? record.studentName.charAt(0).toUpperCase() : <User className="w-4 h-4" />)}
+                            </div>
+                            <div className="flex flex-col text-right">
+                              <div className="font-bold">{record.studentName}</div>
+                              <div className="text-xs opacity-60 font-mono mt-0.5">{record.studentClass}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold border ${
+                            record.type === 'positive' 
+                              ? (isDarkMode ? 'bg-emerald-950/50 border-emerald-500/30 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-600') 
+                              : (isDarkMode ? 'bg-red-950/50 border-red-500/30 text-red-300' : 'bg-red-50 border-red-200 text-red-600')
+                          }`}>
+                            {record.type === 'positive' ? 'إيجابي' : 'سلبي'}
+                          </span>
+                        </td>
+                        <td className="p-4 font-bold">{record.category}</td>
+                        <td className="p-4 text-right text-xs opacity-75 max-w-xs whitespace-normal leading-relaxed">{record.notes}</td>
+                        <td className={`p-4 font-black text-base ${record.points > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {record.points > 0 ? `+${record.points}` : record.points}
+                        </td>
+                        <td className="p-4 text-xs opacity-60">{record.teacher}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* منبثق الإضافة */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-            <div className={`rounded-2xl w-full max-w-md shadow-2xl p-6 relative border ${
+            <div className={`rounded-2xl w-full max-w-md shadow-2xl p-6 relative border max-h-[90vh] overflow-y-auto ${
               isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-900'
             }`}>
               <button onClick={() => setIsModalOpen(false)} className="absolute top-4 left-4 p-1 rounded-lg hover:bg-gray-500/10 text-gray-400 hover:text-gray-200"><X className="w-5 h-5" /></button>
@@ -414,7 +480,7 @@ const Behavior: React.FC = () => {
                     <select
                       value={newRecord.studentIndex}
                       onChange={(e) => setNewRecord({ ...newRecord, studentIndex: e.target.value })}
-                      className={`w-full border rounded-xl px-3 py-2 text-sm font-bold focus:outline-none focus:border-blue-500 ${
+                      className={`w-full border rounded-xl px-3 py-2 text-xs sm:text-sm font-bold focus:outline-none focus:border-blue-500 ${
                         isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200 text-gray-800'
                       }`}
                     >
@@ -444,14 +510,14 @@ const Behavior: React.FC = () => {
 
                   <div>
                     <label className="block text-xs font-bold opacity-75 mb-1">الفئة / نوع الملاحظة:</label>
-                    <input type="text" value={newRecord.category} onChange={(e) => setNewRecord({ ...newRecord, category: e.target.value })} className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 ${
+                    <input type="text" value={newRecord.category} onChange={(e) => setNewRecord({ ...newRecord, category: e.target.value })} className={`w-full border rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-blue-500 ${
                       isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-800'
                     }`} placeholder="مثال: تميز أكاديمي، عدم حل الواجب" required />
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold opacity-75 mb-1">تفاصيل الملاحظة:</label>
-                    <textarea value={newRecord.notes} onChange={(e) => setNewRecord({ ...newRecord, notes: e.target.value })} className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 h-20 resize-none ${
+                    <textarea value={newRecord.notes} onChange={(e) => setNewRecord({ ...newRecord, notes: e.target.value })} className={`w-full border rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-blue-500 h-20 resize-none ${
                       isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-800'
                     }`} placeholder="اكتب تفاصيل السلوك..." required />
                   </div>

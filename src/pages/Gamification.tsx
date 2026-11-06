@@ -433,106 +433,110 @@ const Gamification: React.FC = () => {
         className="fixed inset-0 pointer-events-none z-0" 
       />
 
-      <div className={`relative z-10 min-h-screen p-6 text-right ${isDarkMode ? 'text-white' : 'text-gray-900'}`} dir="rtl">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+      <div className={`relative z-10 min-h-screen p-4 md:p-6 text-right ${isDarkMode ? 'text-white' : 'text-gray-900'}`} dir="rtl">
+        
+        {/* رأس الصفحة والأزرار مترتبة بمرونة للموبايل */}
+        <div className="mb-6 md:mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
             <div>
-              <h1 className={`text-4xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600'}`}>
+              <h1 className={`text-2xl md:text-4xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600'}`}>
                 {isStudent ? '🏆 لوحة الشرف والمتصدرين' : '🎮 نظام النقاط والتحفيز'}
               </h1>
-              <p className={`text-lg ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>
+              <p className={`text-sm md:text-lg ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>
                 {isStudent ? 'تعرف على العشرة الأوائل وتنافس معهم للوصول للقمة' : 'تتبع إنجازات الطلاب وحفزهم بالطريقة المختلطة الذكية'}
               </p>
             </div>
+            
             {!isStudent && (
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-2 md:gap-3">
                 <button
                   onClick={() => setShowBadgeManagerModal(true)}
-                  className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-5 py-3 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105 font-medium shadow-md"
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2.5 rounded-xl hover:shadow-lg transition-all duration-300 font-medium shadow-md text-xs md:text-sm"
                 >
-                  <Sparkles className="w-5 h-5" />
-                  إدارة الشارات (تعديل) 🏅
+                  <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
+                  إدارة الشارات 🏅
                 </button>
                 
                 <button
                   onClick={() => setShowAddPointsModal(true)}
-                  className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-5 py-3 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105 font-medium shadow-md"
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2.5 rounded-xl hover:shadow-lg transition-all duration-300 font-medium shadow-md text-xs md:text-sm"
                 >
-                  <Plus className="w-5 h-5" />
-                  إدارة النقاط (تعديل)
+                  <Plus className="w-4 h-4 md:w-5 md:h-5" />
+                  إدارة النقاط
                 </button>
               </div>
             )}
           </div>
 
-          <div className="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 rounded-2xl p-6 shadow-xl">
-            <div className="flex items-center justify-center gap-4 text-white">
-              <Zap className="w-8 h-8 animate-pulse" />
-              <p className="text-2xl font-bold">{currentMotivMessage}</p>
-              <Zap className="w-8 h-8 animate-pulse" />
+          <div className="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 rounded-2xl p-4 md:p-6 shadow-xl text-center">
+            <div className="flex items-center justify-center gap-2 md:gap-4 text-white">
+              <Zap className="w-6 h-6 md:w-8 md:h-8 animate-pulse shrink-0" />
+              <p className="text-base md:text-2xl font-bold">{currentMotivMessage}</p>
+              <Zap className="w-6 h-6 md:w-8 md:h-8 animate-pulse shrink-0" />
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className={`rounded-2xl p-6 shadow-xl backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-yellow-200'}`}>
+        {/* الكروت الأربعة العلوية */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+          <div className={`rounded-2xl p-4 md:p-6 shadow-xl backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-yellow-200'}`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-sm mb-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>إجمالي الطلاب</p>
-                <p className="text-3xl font-bold text-yellow-500">{students.length}</p>
+                <p className={`text-xs md:text-sm mb-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>إجمالي الطلاب</p>
+                <p className="text-2xl md:text-3xl font-bold text-yellow-500">{students.length}</p>
               </div>
-              <div className={`p-4 rounded-xl ${isDarkMode ? 'bg-yellow-950/40 text-yellow-400' : 'bg-yellow-100 text-yellow-600'}`}>
-                <Users className="w-8 h-8" />
+              <div className={`p-3 md:p-4 rounded-xl ${isDarkMode ? 'bg-yellow-950/40 text-yellow-400' : 'bg-yellow-100 text-yellow-600'}`}>
+                <Users className="w-6 h-6 md:w-8 md:h-8" />
               </div>
             </div>
           </div>
 
-          <div className={`rounded-2xl p-6 shadow-xl backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-blue-200'}`}>
+          <div className={`rounded-2xl p-4 md:p-6 shadow-xl backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-blue-200'}`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-sm mb-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>إجمالي الشارات</p>
-                <p className="text-3xl font-bold text-blue-500">{totalBadgesCalculated}</p>
+                <p className={`text-xs md:text-sm mb-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>إجمالي الشارات</p>
+                <p className="text-2xl md:text-3xl font-bold text-blue-500">{totalBadgesCalculated}</p>
               </div>
-              <div className={`p-4 rounded-xl ${isDarkMode ? 'bg-blue-950/40 text-blue-400' : 'bg-blue-100 text-blue-600'}`}>
-                <Award className="w-8 h-8" />
+              <div className={`p-3 md:p-4 rounded-xl ${isDarkMode ? 'bg-blue-950/40 text-blue-400' : 'bg-blue-100 text-blue-600'}`}>
+                <Award className="w-6 h-6 md:w-8 md:h-8" />
               </div>
             </div>
           </div>
 
-          <div className={`rounded-2xl p-6 shadow-xl backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-green-200'}`}>
+          <div className={`rounded-2xl p-4 md:p-6 shadow-xl backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-green-200'}`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-sm mb-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>متوسط النقاط</p>
-                <p className="text-3xl font-bold text-emerald-500">{averagePoints}</p>
+                <p className={`text-xs md:text-sm mb-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>متوسط النقاط</p>
+                <p className="text-2xl md:text-3xl font-bold text-emerald-500">{averagePoints}</p>
               </div>
-              <div className={`p-4 rounded-xl ${isDarkMode ? 'bg-emerald-950/40 text-emerald-400' : 'bg-green-100 text-green-600'}`}>
-                <TrendingUp className="w-8 h-8" />
+              <div className={`p-3 md:p-4 rounded-xl ${isDarkMode ? 'bg-emerald-950/40 text-emerald-400' : 'bg-green-100 text-green-600'}`}>
+                <TrendingUp className="w-6 h-6 md:w-8 md:h-8" />
               </div>
             </div>
           </div>
 
-          <div className={`rounded-2xl p-6 shadow-xl backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-purple-200'}`}>
+          <div className={`rounded-2xl p-4 md:p-6 shadow-xl backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-purple-200'}`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-sm mb-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>أعلى نقاط</p>
-                <p className="text-3xl font-bold text-purple-500">{highestPoints}</p>
+                <p className={`text-xs md:text-sm mb-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>أعلى نقاط</p>
+                <p className="text-2xl md:text-3xl font-bold text-purple-500">{highestPoints}</p>
               </div>
-              <div className={`p-4 rounded-xl ${isDarkMode ? 'bg-purple-950/40 text-purple-400' : 'bg-purple-100 text-purple-600'}`}>
-                <Star className="w-8 h-8" />
+              <div className={`p-3 md:p-4 rounded-xl ${isDarkMode ? 'bg-purple-950/40 text-purple-400' : 'bg-purple-100 text-purple-600'}`}>
+                <Star className="w-6 h-6 md:w-8 md:h-8" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* التخطيط المتوازن لملء الفراغات وعرض العناصر بشكل مرتب */}
+        {/* التخطيط المتوازن المحدث للموبايل والشاشات الكبيرة */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
-            <div className={`rounded-2xl shadow-xl p-6 backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-100'}`}>
+            <div className={`rounded-2xl shadow-xl p-4 md:p-6 backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-100'}`}>
               <div className="flex items-center gap-3 mb-6">
                 <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-3 rounded-xl shadow-md">
                   <Trophy className="w-6 h-6 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold">🏆 لوحة المتصدرين (أفضل 10 طلاب)</h2>
+                <h2 className="text-xl md:text-2xl font-bold">🏆 لوحة المتصدرين (أفضل 10 طلاب)</h2>
               </div>
 
               {topStudents.length === 0 ? (
@@ -552,7 +556,7 @@ const Gamification: React.FC = () => {
                     return (
                       <div
                         key={student.id}
-                        className={`relative overflow-hidden rounded-xl p-4 transition-all duration-300 hover:shadow-lg border ${
+                        className={`relative overflow-hidden rounded-xl p-3 md:p-4 transition-all duration-300 hover:shadow-lg border ${
                           index === 0
                             ? (isDarkMode ? 'border-yellow-500/40 bg-yellow-950/20' : 'border-yellow-400 bg-gradient-to-r from-yellow-50 to-orange-50')
                             : index === 1
@@ -562,28 +566,29 @@ const Gamification: React.FC = () => {
                             : (isDarkMode ? 'border-slate-800 bg-slate-950/50' : 'border-gray-200 bg-white')
                         }`}
                       >
-                        <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-4">
-                          <div className="flex items-center gap-4 flex-1 min-w-0">
+                        {/* استخدام flex-col للشاشات الصغيرة لتجنب أي تداخل في النصوص */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                             <div className="flex-shrink-0">
                               {index < 3 ? (
-                                <div className={`w-12 h-12 rounded-full ${getRankColor(index + 1)} flex items-center justify-center shadow-lg`}>
+                                <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full ${getRankColor(index + 1)} flex items-center justify-center shadow-lg`}>
                                   {getRankIcon(index + 1)}
                                 </div>
                               ) : (
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-base md:text-lg shadow-lg">
                                   {index + 1}
                                 </div>
                               )}
                             </div>
 
                             <div className="flex-shrink-0">
-                              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xl border-2 border-white/20 shadow-lg">
+                              <div className="w-11 h-11 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg md:text-xl border-2 border-white/20 shadow-lg">
                                 {student.firstName ? student.firstName.charAt(0) : 'ط'}
                               </div>
                             </div>
 
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-lg font-bold truncate">{student.firstName} {student.lastName}</h3>
+                              <h3 className="text-base md:text-lg font-bold truncate">{student.firstName} {student.lastName}</h3>
                               
                               <div className="flex flex-wrap items-center gap-2 mt-1">
                                 <span className={`text-xs px-2 py-0.5 rounded-md ${isDarkMode ? 'bg-slate-800 text-slate-300' : 'text-gray-600 bg-gray-100'}`}>الصف: {student.class}</span>
@@ -594,7 +599,7 @@ const Gamification: React.FC = () => {
                                   {studentCustomBadges.map(b => (
                                     <span 
                                       key={b.id} 
-                                      className={`inline-flex items-center gap-1 text-[11px] font-bold text-white bg-gradient-to-r ${b.colorClass} pl-2 pr-2.5 py-0.5 rounded-full shadow-sm`}
+                                      className={`inline-flex items-center gap-1 text-[10px] md:text-[11px] font-bold text-white bg-gradient-to-r ${b.colorClass} pl-2 pr-2.5 py-0.5 rounded-full shadow-sm`}
                                     >
                                       <span>🏅 {b.badgeName}</span>
                                       {!isStudent && (
@@ -613,21 +618,21 @@ const Gamification: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* تنظيم العدادات والأرقام بشكل منسق وجذاب */}
-                          <div className="flex items-center gap-4 bg-black/10 dark:bg-white/5 p-3 rounded-xl border border-white/10 shrink-0">
+                          {/* عدادات النقاط مرتبة بشكل أنيق ومتجاوب */}
+                          <div className="flex items-center justify-around sm:justify-end gap-3 bg-black/10 dark:bg-white/5 p-2.5 rounded-xl border border-white/10 shrink-0">
                             <div className="text-center px-2">
-                              <p className="text-xl font-extrabold text-purple-400">{student.points ?? 0}</p>
-                              <p className={`text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>نقطة</p>
+                              <p className="text-lg md:text-xl font-extrabold text-purple-400">{student.points ?? 0}</p>
+                              <p className={`text-[10px] md:text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>نقطة</p>
                             </div>
-                            <div className="h-8 w-[1px] bg-white/20"></div>
+                            <div className="h-6 sm:h-8 w-[1px] bg-white/20"></div>
                             <div className="text-center px-2">
-                              <p className="text-xl font-extrabold text-blue-400">{combinedBadgeCount}</p>
-                              <p className={`text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>شارة</p>
+                              <p className="text-lg md:text-xl font-extrabold text-blue-400">{combinedBadgeCount}</p>
+                              <p className={`text-[10px] md:text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>شارة</p>
                             </div>
-                            <div className="h-8 w-[1px] bg-white/20"></div>
+                            <div className="h-6 sm:h-8 w-[1px] bg-white/20"></div>
                             <div className="text-center px-2">
-                              <p className="text-xl font-extrabold text-emerald-400">{(student.gpa ?? 0).toFixed(1)}</p>
-                              <p className={`text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>المعدل</p>
+                              <p className="text-lg md:text-xl font-extrabold text-emerald-400">{(student.gpa ?? 0).toFixed(1)}</p>
+                              <p className={`text-[10px] md:text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>المعدل</p>
                             </div>
                           </div>
                         </div>
@@ -638,12 +643,12 @@ const Gamification: React.FC = () => {
               )}
             </div>
 
-            <div className={`rounded-2xl shadow-xl p-6 backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-100'}`}>
+            <div className={`rounded-2xl shadow-xl p-4 md:p-6 backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-gray-100'}`}>
               <div className="flex items-center gap-3 mb-6">
                 <div className="bg-gradient-to-r from-blue-400 to-purple-500 p-3 rounded-xl shadow-md">
                   <Target className="w-6 h-6 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold">📊 توزيع النقاط المشهود</h2>
+                <h2 className="text-xl md:text-2xl font-bold">📊 توزيع النقاط المشهود</h2>
               </div>
 
               <div className="space-y-4">
@@ -655,12 +660,12 @@ const Gamification: React.FC = () => {
                   return (
                     <div key={student.id}>
                       <div className="flex items-center justify-between mb-2">
-                        <span className={`text-sm font-semibold ${isDarkMode ? 'text-slate-200' : 'text-gray-700'}`}>
+                        <span className={`text-xs md:text-sm font-semibold ${isDarkMode ? 'text-slate-200' : 'text-gray-700'}`}>
                           {student.firstName} {student.lastName}
                         </span>
-                        <span className="text-sm font-bold text-purple-400">{points} نقطة</span>
+                        <span className="text-xs md:text-sm font-bold text-purple-400">{points} نقطة</span>
                       </div>
-                      <div className={`w-full rounded-full h-3 overflow-hidden ${isDarkMode ? 'bg-slate-800' : 'bg-gray-200'}`}>
+                      <div className={`w-full rounded-full h-2.5 md:h-3 overflow-hidden ${isDarkMode ? 'bg-slate-800' : 'bg-gray-200'}`}>
                         <div
                           className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
                           style={{ width: `${percentage}%` }}
@@ -674,14 +679,14 @@ const Gamification: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            <div className={`rounded-2xl shadow-xl p-6 backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-purple-100'}`}>
+            <div className={`rounded-2xl shadow-xl p-4 md:p-6 backdrop-blur-md border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-purple-100'}`}>
               <div className="flex items-center gap-3 mb-4">
                 <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-3 rounded-xl text-white shadow-md">
                   <Clock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold">🔔 حركة النقاط والشارات الحية</h2>
-                  <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>يحدث تلقائياً ومحفوظ باستمرار</p>
+                  <h2 className="text-lg md:text-xl font-bold">🔔 حركة النقاط الحية</h2>
+                  <p className={`text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>يحدث تلقائياً ومحفوظ باستمرار</p>
                 </div>
               </div>
 
@@ -703,7 +708,7 @@ const Gamification: React.FC = () => {
                       }`}
                     >
                       <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-bold text-sm truncate max-w-[140px]">{log.studentName}</h4>
+                        <h4 className="font-bold text-xs md:text-sm truncate max-w-[140px]">{log.studentName}</h4>
                         <span className="text-[10px] opacity-70">{formatTimeAgo(log.timestamp)}</span>
                       </div>
                       <p className="text-xs opacity-90">{log.reason}</p>
@@ -720,6 +725,7 @@ const Gamification: React.FC = () => {
           </div>
         </div>
 
+        {/* Modal إضافة النقاط */}
         {!isStudent && showAddPointsModal && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
             <div className={`rounded-2xl w-full max-w-lg shadow-2xl p-6 relative border ${
@@ -731,11 +737,11 @@ const Gamification: React.FC = () => {
                   <label className="block text-sm font-semibold mb-1">اختر الطالب</label>
                   <select 
                     value={modalStudentId} 
-                    onChange={(e) => setModalStudentId(e.target.value)} 
+                    onChange={(e) => setModalStudentId(e.target.value)}
+                    className={`w-full p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}
                     required
-                    className={`w-full p-3 rounded-xl border focus:outline-none ${isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200'}`}
                   >
-                    <option value="">-- اختر طالباً --</option>
+                    <option value="">-- اختر طالب --</option>
                     {students.map(s => (
                       <option key={s.id} value={s.id}>{s.firstName} {s.lastName} ({s.class})</option>
                     ))}
@@ -746,12 +752,12 @@ const Gamification: React.FC = () => {
                   <div>
                     <label className="block text-sm font-semibold mb-1">نوع العملية</label>
                     <select 
-                      value={actionType} 
+                      value={actionType}
                       onChange={(e) => setActionType(e.target.value as 'add' | 'deduct')}
-                      className={`w-full p-3 rounded-xl border focus:outline-none ${isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200'}`}
+                      className={`w-full p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}
                     >
-                      <option value="add">إضافة نقاط (+)</option>
-                      <option value="deduct">خصم نقاط (-)</option>
+                      <option value="add">إضافة نقاط ➕</option>
+                      <option value="deduct">خصم نقاط ➖</option>
                     </select>
                   </div>
                   <div>
@@ -759,50 +765,63 @@ const Gamification: React.FC = () => {
                     <input 
                       type="number" 
                       min="1" 
-                      required
-                      value={modalPoints || ''} 
+                      value={modalPoints || ''}
                       onChange={(e) => setModalPoints(Number(e.target.value))}
-                      className={`w-full p-3 rounded-xl border focus:outline-none ${isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200'}`}
+                      className={`w-full p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}
+                      placeholder="مثال: 10"
+                      required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold mb-1">السبب أو الملاحظة</label>
+                  <label className="block text-sm font-semibold mb-1">السبب / الملاحظة</label>
                   <input 
-                    type="text" 
-                    placeholder="مثال: تميز في حل الواجب المدرسي..."
-                    value={modalReason} 
+                    type="text"
+                    value={modalReason}
                     onChange={(e) => setModalReason(e.target.value)}
-                    className={`w-full p-3 rounded-xl border focus:outline-none ${isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200'}`}
+                    className={`w-full p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}
+                    placeholder="مثال: تفوق متميز في الحصة"
                   />
                 </div>
 
-                <div className="flex gap-3 pt-2">
-                  <button type="submit" className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl shadow-md transition-all">حفظ وتطبيق</button>
-                  <button type="button" onClick={() => setShowAddPointsModal(false)} className={`flex-1 font-semibold py-3 rounded-xl ${isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-gray-200 text-gray-700'}`}>إلغاء</button>
+                <div className="flex justify-end gap-3 pt-4">
+                  <button 
+                    type="button"
+                    onClick={() => setShowAddPointsModal(false)}
+                    className={`px-5 py-2.5 rounded-xl border font-medium ${isDarkMode ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                  >
+                    إلغاء
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium shadow-lg hover:opacity-90"
+                  >
+                    حفظ التعديل
+                  </button>
                 </div>
               </form>
             </div>
           </div>
         )}
 
+        {/* Modal إدارة الشارات */}
         {!isStudent && showBadgeManagerModal && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
             <div className={`rounded-2xl w-full max-w-lg shadow-2xl p-6 relative border ${
               isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-gray-200 text-gray-900'
             }`}>
-              <h3 className="text-xl font-bold mb-4">إدارة الشارات المخصصة</h3>
+              <h3 className="text-xl font-bold mb-4">إدارة الشارات المخصصة للطلاب 🏅</h3>
               <form onSubmit={handleBadgeManagerSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold mb-1">اختر الطالب</label>
                   <select 
                     value={badgeStudentId} 
-                    onChange={(e) => setBadgeStudentId(e.target.value)} 
+                    onChange={(e) => setBadgeStudentId(e.target.value)}
+                    className={`w-full p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}
                     required
-                    className={`w-full p-3 rounded-xl border focus:outline-none ${isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200'}`}
                   >
-                    <option value="">-- اختر طالباً --</option>
+                    <option value="">-- اختر طالب --</option>
                     {students.map(s => (
                       <option key={s.id} value={s.id}>{s.firstName} {s.lastName} ({s.class})</option>
                     ))}
@@ -811,14 +830,14 @@ const Gamification: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold mb-1">الإجراء</label>
+                    <label className="block text-sm font-semibold mb-1">نوع العملية</label>
                     <select 
-                      value={badgeActionType} 
+                      value={badgeActionType}
                       onChange={(e) => setBadgeActionType(e.target.value as 'add' | 'deduct')}
-                      className={`w-full p-3 rounded-xl border focus:outline-none ${isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200'}`}
+                      className={`w-full p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}
                     >
-                      <option value="add">منح شارة جديدة</option>
-                      <option value="deduct">سحب شارة</option>
+                      <option value="add">منح شارات ➕</option>
+                      <option value="deduct">سحب شارات ➖</option>
                     </select>
                   </div>
                   <div>
@@ -826,10 +845,10 @@ const Gamification: React.FC = () => {
                     <input 
                       type="number" 
                       min="1" 
-                      required
-                      value={badgeCountInput} 
+                      value={badgeCountInput || ''}
                       onChange={(e) => setBadgeCountInput(Number(e.target.value))}
-                      className={`w-full p-3 rounded-xl border focus:outline-none ${isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200'}`}
+                      className={`w-full p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}
+                      required
                     />
                   </div>
                 </div>
@@ -839,37 +858,50 @@ const Gamification: React.FC = () => {
                     <div>
                       <label className="block text-sm font-semibold mb-1">اسم الشارة</label>
                       <input 
-                        type="text" 
-                        placeholder="مثال: فارس القراءة / بطل الرياضيات..."
-                        value={badgeNameInput} 
+                        type="text"
+                        value={badgeNameInput}
                         onChange={(e) => setBadgeNameInput(e.target.value)}
-                        className={`w-full p-3 rounded-xl border focus:outline-none ${isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200'}`}
+                        className={`w-full p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}
+                        placeholder="مثال: ملك الإبداع، بطل المادة"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-1">تدرج اللون</label>
+                      <label className="block text-sm font-semibold mb-1">لون الشارة</label>
                       <select 
-                        value={badgeColorInput} 
+                        value={badgeColorInput}
                         onChange={(e) => setBadgeColorInput(e.target.value)}
-                        className={`w-full p-3 rounded-xl border focus:outline-none ${isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-gray-50 border-gray-200'}`}
+                        className={`w-full p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}
                       >
-                        <option value="from-blue-500 to-blue-700">أزرق متدرج</option>
-                        <option value="from-purple-500 to-pink-500">بنفسجي وردي</option>
-                        <option value="from-emerald-500 to-teal-700">أخضر زمردي</option>
-                        <option value="from-yellow-500 to-amber-600">ذهبي فخم</option>
+                        <option value="from-blue-500 to-blue-700">أزرق 🔵</option>
+                        <option value="from-purple-500 to-indigo-700">بنفسجي 🟣</option>
+                        <option value="from-emerald-500 to-green-700">أخضر 🟢</option>
+                        <option value="from-amber-500 to-orange-700">ذهبي 🟡</option>
+                        <option value="from-pink-500 to-rose-700">وردي 🌸</option>
                       </select>
                     </div>
                   </>
                 )}
 
-                <div className="flex gap-3 pt-2">
-                  <button type="submit" className="flex-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-xl shadow-md transition-all">تأكيد الشارات</button>
-                  <button type="button" onClick={() => setShowBadgeManagerModal(false)} className={`flex-1 font-semibold py-3 rounded-xl ${isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-gray-200 text-gray-700'}`}>إلغاء</button>
+                <div className="flex justify-end gap-3 pt-4">
+                  <button 
+                    type="button"
+                    onClick={() => setShowBadgeManagerModal(false)}
+                    className={`px-5 py-2.5 rounded-xl border font-medium ${isDarkMode ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                  >
+                    إلغاء
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-medium shadow-lg hover:opacity-90"
+                  >
+                    تنفيذ
+                  </button>
                 </div>
               </form>
             </div>
           </div>
         )}
+
       </div>
     </Layout>
   );

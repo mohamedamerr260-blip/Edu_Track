@@ -1,20 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { 
-  calculateGPA,
-  calculateAttendancePercentage,
-  formatDate,
-  groupBy,
-} from '../lib/index';
-import type { Grade, StudentBadge } from '../lib/index';
-import {
-  mockNotifications,
-  getGradesByStudentId,
-  getAttendanceByStudentId,
-  getBadgesByStudentId,
-  getStudentRanking,
-} from '../data/index';
 
 const StudentDashboard: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -143,7 +129,7 @@ const StudentDashboard: React.FC = () => {
     };
   }, [isDarkMode]);
 
-  // جلب الطالب الحقيقي من سجلات المعلم في الـ localStorage أولاً
+  // جلب الطالب الحقيقي وتصفير البيانات تماماً
   const [currentStudent, setCurrentStudent] = useState<any>(null);
 
   useEffect(() => {
@@ -152,7 +138,6 @@ const StudentDashboard: React.FC = () => {
       try {
         const parsed = JSON.parse(savedStudents);
         if (parsed && parsed.length > 0) {
-          // لو فيه ID محدد في الـ URL أو ناخذ الأول
           const found = id ? parsed.find((s: any) => s.id === id) : parsed[0];
           if (found) {
             setCurrentStudent({
@@ -160,9 +145,11 @@ const StudentDashboard: React.FC = () => {
               fullName: `${found.firstName} ${found.lastName}`,
               class: found.class || 'الفصل الأول',
               avatar: found.avatar || '',
-              attendance: found.attendance || 95,
-              gpa: found.gpa || 3.8,
-              grades: found.grades || { math: 90, science: 85, arabic: 92, english: 88, history: 95, geography: 89 }
+              attendance: found.attendance || 0,
+              gpa: found.gpa || 0,
+              grades: found.grades || { math: 0, science: 0, arabic: 0, english: 0, history: 0, geography: 0 },
+              points: found.points || 0,
+              badges: found.badges || []
             });
           }
         }
@@ -172,30 +159,25 @@ const StudentDashboard: React.FC = () => {
     }
   }, [id]);
 
-  const studentId = id || 'std-001';
   const student = currentStudent || {
-    id: studentId,
-    fullName: 'أحمد محمد',
+    fullName: 'طالب جديد',
     class: 'الصف الثاني الثانوي',
     avatar: '',
-    attendance: 96,
-    gpa: 3.9,
-    grades: { math: 95, science: 90, arabic: 92, english: 94, history: 88, geography: 91 }
+    attendance: 0,
+    gpa: 0,
+    grades: { math: 0, science: 0, arabic: 0, english: 0, history: 0, geography: 0 },
+    points: 0,
+    badges: []
   };
 
-  const grades = getGradesByStudentId(studentId);
-  const attendance = getAttendanceByStudentId(studentId);
-  const badges = getBadgesByStudentId(studentId);
-  const ranking = getStudentRanking(studentId);
-
-  // حساب الإحصائيات
-  const averageGrade = student.grades ? (Object.values(student.grades) as number[]).reduce((a, b) => a + b, 0) / 6 : 88;
-  const attendancePercentage = student.attendance || calculateAttendancePercentage(attendance);
-  const totalPoints = badges.reduce((sum: number, badge: StudentBadge) => sum + badge.badge.points, 0) + 120;
+  // حساب الإحصائيات (متصفرة تماماً)
+  const gradesValues = Object.values(student.grades || {}) as number[];
+  const averageGrade = gradesValues.length > 0 ? gradesValues.reduce((a, b) => a + b, 0) / gradesValues.length : 0;
+  const attendancePercentage = student.attendance || 0;
+  const totalPoints = student.points || 0; // متصفرة تماماً بناءً على بيانات الطالب الحقيقية
 
   const overallLevel = Math.round((averageGrade * 0.5) + (attendancePercentage * 0.3) + (Math.min(totalPoints / 10, 20)));
 
-  const gradesBySubject = groupBy(grades, 'subject');
   const recentGradesBySubject = Object.entries(student.grades || {}).map(([subj, val]) => {
     const subjectsMap: Record<string, string> = {
       math: 'الرياضيات',
@@ -209,17 +191,13 @@ const StudentDashboard: React.FC = () => {
       subject: subjectsMap[subj] || subj,
       grade: {
         numericValue: val as number,
-        assignmentName: 'الاختبار الدوري المعتمد',
-        gradedDate: new Date()
+        assignmentName: (val as number) > 0 ? 'الاختبار الدوري المعتمد' : 'لم يتم رصد درجات بعد'
       }
     };
   });
 
-  const recentNotifications = mockNotifications
-    .filter(n => !n.isRead)
-    .slice(0, 3);
-
   const getGradeColorClass = (value: number): string => {
+    if (value === 0) return isDarkMode ? 'bg-slate-950/40 border-slate-800 text-slate-500' : 'text-gray-400 bg-gray-50 border-gray-200';
     if (value >= 90) return isDarkMode ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-300' : 'text-green-600 bg-green-50 border-green-200';
     if (value >= 75) return isDarkMode ? 'bg-blue-950/40 border-blue-500/30 text-blue-300' : 'text-yellow-600 bg-yellow-50 border-yellow-200';
     return isDarkMode ? 'bg-rose-950/40 border-rose-500/30 text-rose-300' : 'text-red-600 bg-red-50 border-red-200';
@@ -227,10 +205,9 @@ const StudentDashboard: React.FC = () => {
 
   return (
     <Layout>
-      {/* خلفية الجزيئات الثابتة */}
       <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />
 
-      <div className={`relative z-10 space-y-6 text-right pb-12 ${isDarkMode ? 'text-white' : 'text-gray-900'}`} dir="rtl">
+      <div className={`relative z-10 space-y-6 text-right pb-12 px-2 sm:px-0 ${isDarkMode ? 'text-white' : 'text-gray-900'}`} dir="rtl">
         
         {/* قسم الترحيب بالطالب */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-xl p-6 text-white backdrop-blur-md">
@@ -251,13 +228,13 @@ const StudentDashboard: React.FC = () => {
               <p className="text-blue-100 mt-1 font-medium">{student.class}</p>
             </div>
             <div className="text-center bg-white/10 border border-white/20 rounded-xl px-6 py-3 backdrop-blur-sm">
-              <div className="text-3xl font-black">#{ranking?.rank || 1}</div>
+              <div className="text-3xl font-black">#-</div>
               <div className="text-xs text-blue-100 mt-0.5">الترتيب بالفصل</div>
             </div>
           </div>
         </div>
 
-        {/* بطاقات الإحصائيات الشخصية */}
+        {/* بطاقات الإحصائيات الشخصية (متصفرة تماماً) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className={`p-5 rounded-2xl border backdrop-blur-md shadow-lg ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-100'}`}>
             <div className="flex items-center justify-between">
@@ -331,7 +308,6 @@ const StudentDashboard: React.FC = () => {
                 </div>
                 <div className="text-xs opacity-80">
                   <div>{grade.assignmentName}</div>
-                  <div className="mt-1">{formatDate(grade.gradedDate)}</div>
                 </div>
               </div>
             ))}
@@ -342,25 +318,17 @@ const StudentDashboard: React.FC = () => {
         <div className={`rounded-2xl shadow-xl p-6 border backdrop-blur-md ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-100'}`}>
           <div className="flex items-center justify-between mb-4">
             <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>أوسمتك وشارات التميز</h2>
-            <span className={`text-xs font-bold px-3 py-1 rounded-full ${isDarkMode ? 'bg-blue-950 text-blue-300' : 'bg-blue-50 text-blue-600'}`}>{badges.length + 3} وسام</span>
+            <span className={`text-xs font-bold px-3 py-1 rounded-full ${isDarkMode ? 'bg-blue-950 text-blue-300' : 'bg-blue-50 text-blue-600'}`}>{student.badges.length} وسام</span>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <div className={`flex flex-col items-center p-4 rounded-xl border transition-all ${isDarkMode ? 'bg-slate-950/50 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-100 text-slate-800'}`}>
-              <span className="text-4xl mb-2">🏆</span>
-              <span className="font-bold text-xs text-center">أول الفصل</span>
-              <span className="text-[10px] text-blue-400 mt-1">50 نقطة</span>
+          {student.badges.length === 0 ? (
+            <div className="text-center py-6 text-gray-400 text-sm font-medium">
+              لم تحصل على أوسمة بعد. استمر في التميز ليتم تكريمك من المعلم!
             </div>
-            <div className={`flex flex-col items-center p-4 rounded-xl border transition-all ${isDarkMode ? 'bg-slate-950/50 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-100 text-slate-800'}`}>
-              <span className="text-4xl mb-2">⭐</span>
-              <span className="font-bold text-xs text-center">الطالب المثالي</span>
-              <span className="text-[10px] text-blue-400 mt-1">40 نقطة</span>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {/* عرض الأوسمة المكتسبة */}
             </div>
-            <div className={`flex flex-col items-center p-4 rounded-xl border transition-all ${isDarkMode ? 'bg-slate-950/50 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-100 text-slate-800'}`}>
-              <span className="text-4xl mb-2">🎯</span>
-              <span className="font-bold text-xs text-center">التسليم المبكر</span>
-              <span className="text-[10px] text-blue-400 mt-1">30 نقطة</span>
-            </div>
-          </div>
+          )}
         </div>
 
       </div>
